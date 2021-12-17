@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
-const sq = require('../config/connection');
-const postLoker = require('../module/postLoker/model');
+const sq = require('../../config/connection');
+const postLoker = require('../postLoker/model');
 
 const kelengkapanLamaran = sq.define('kelengkapanLamaran', {
     id: {

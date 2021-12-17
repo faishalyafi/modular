@@ -1,8 +1,8 @@
-const kelengkapanLamaran = require("../model/kelengkapanLamaranModel");
-const riwayatPendidikan = require("../model/riwayatPendidikan");
-const pengalamanKerja = require("../module/pengalamanKerja/model");
+const kelengkapanLamaran = require("./model");
+const riwayatPendidikan = require("../riwayatPendidikan/model");
+const pengalamanKerja = require("../pengalamanKerja/model");
 const { v4: uuid_v4 } = require("uuid");
-const sq = require("../config/connection");
+const sq = require("../../config/connection");
 const { Sequelize } = require('sequelize');
 const Op = Sequelize.Op;
 class Controller {

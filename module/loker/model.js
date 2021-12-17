@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
-const sq = require('../config/connection');
-const masterPosisi = require('./masterPosisiModel');
+const sq = require('../../config/connection');
+const masterPosisi = require('../../model/masterPosisiModel');
 
 const loker = sq.define('loker', {
     id: {
