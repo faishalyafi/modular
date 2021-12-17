@@ -1,6 +1,6 @@
-const bankModel = require("../model/bankModel");
+const bankModel = require("./model");
 const { v4: uuid_v4 } = require("uuid");
-const sq = require("../config/connection");
+const sq = require("../../config/connection");
 
 class Controller {
   static register(req, res) {
