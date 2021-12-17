@@ -1,19 +1,10 @@
 const router = require("express").Router();
-<<<<<<< HEAD
 const user = require("../module/masterUser/route");
 const log = require("../module/log/route");
 const unit = require("../module/masterUnit/route");
 const customerCategory = require("../module/masterKategoriCustomer/route");
 const customer = require("../module/masterCustomer/route");
 const masterKategoriBarang = require("../module/masterKategoriBarang/route");
-=======
-const user = require("../module/user/route");
-const log = require("./log");
-const unit = require("./unit");
-const customerCategory = require("./customerCategory");
-const customer = require("./customer");
-const masterKategoriBarang = require("./masterKategoriBarang");
->>>>>>> c18e09ce7879a1c5ed657d0ceb77d799163e8261
 const masterBarang = require("../module/masterBarang/route");
 const masterSupplier = require("../module/masterSupplier/route");
 const pic = require("../module/masterPic/route");
