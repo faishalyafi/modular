@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const sq = require("../config/connection");
 
 const masterBarang = require('../model/masterBarangModel');
-const subTransaksiPO = require('../model/subTransaksiPOModel');
+const subTransaksiPO = require('../module/subTransaksiPO/model');
 const gudang = require('../module/gudang/model');
 
 const stock = sq.define(
