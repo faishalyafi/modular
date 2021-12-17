@@ -3,7 +3,7 @@ const sq = require("../config/connection");
 
 const barang = require("./masterBarangModel");
 const transaksiPO = require("./transaksiPOModel");
-const gudang = require("./gudangModel");
+const gudang = require("../module/gudang/model");
 
 const subTransaksiPO = sq.define( 
   "subTransaksiPO",

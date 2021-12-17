@@ -3,7 +3,7 @@ const sq = require("../config/connection");
 
 const masterBarang = require('../model/masterBarangModel');
 const subTransaksiPO = require('../model/subTransaksiPOModel');
-const gudang = require('../model/gudangModel');
+const gudang = require('../module/gudang/model');
 
 const stock = sq.define(
   "stock",
