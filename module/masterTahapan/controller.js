@@ -1,5 +1,5 @@
-const tahapan = require('../model/masterTahapanModel');
-const sq = require("../config/connection");
+const tahapan = require('./model');
+const sq = require("../../config/connection");
 const { v4: uuid_v4 } = require("uuid");
 
 class Controller {
