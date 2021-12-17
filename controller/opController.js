@@ -4,7 +4,7 @@ const { v4: uuid_v4 } = require("uuid");
 const sq = require("../config/connection");
 const moment = require("moment");
 const subOP = require("../model/subOPModel");
-const masterPiutang = require("../model/masterPiutangModel");
+const masterPiutang = require("../module/masterPiutang/model");
 const { DatabaseError } = require("pg-protocol"); 
 
 class Controller {
