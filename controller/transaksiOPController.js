@@ -3,7 +3,7 @@ const subTransaksiOP = require("../model/subTransaksiOP");
 const { v4: uuid_v4 } = require("uuid");
 const sq = require("../config/connection");
 const moment = require("moment");
-const stock = require("../model/stockModel");
+const stock = require("../module/stock/model");
 const masterBarang = require("../model/masterBarangModel");
 
 class Controller {

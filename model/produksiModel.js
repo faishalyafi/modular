@@ -3,7 +3,7 @@ const sq = require("../config/connection");
 
 const formula = require("./formulaModel");
 const user = require("./userModel");
-const gudang = require("../model/gudangModel");
+const gudang = require("../module/gudang/model");
 
 const produksi = sq.define(
   "produksi",

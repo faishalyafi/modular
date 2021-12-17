@@ -1,5 +1,5 @@
 const stockKeluar = require("../model/stockKeluarModel");
-const stock = require("../model/stockModel");
+const stock = require("../module/stock/model");
 const masterBarang = require("../model/masterBarangModel");
 const sq = require("../config/connection");
 const { v4: uuid_v4 } = require("uuid");
