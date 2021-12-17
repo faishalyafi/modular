@@ -37,7 +37,7 @@ const riwayatPendidikan = require('./riwayatPendidikan');
 const pengalamanKerja = require('./pengalamanKerja');
 const PR = require("./PR");
 const masterTahapan = require("./masterTahapan");
-const poolTahapan = require("./poolTahapan");
+const poolTahapan = require("../module/poolTahapan/route");
 const masterPiutang = require("../module/masterPiutang/route");
 
 
