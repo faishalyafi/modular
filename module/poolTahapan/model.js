@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sq =  require('../../config/connection');
-const masterTahapan = require('../../model/masterTahapanModel');
+const masterTahapan = require('../masterTahapan/model');
 const postLoker=require('../../model/postLokerModel')
 
 const poolTahapan = sq.define('poolTahapan',{
