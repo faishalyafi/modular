@@ -1,5 +1,5 @@
-const Controller = require("../controller/opController");
-const authentification = require("../middleware/authentification");
+const Controller = require("./controller");
+const authentification = require("../../middleware/authentification");
 const router = require("express").Router();
 
 router.post("/register", authentification, Controller.register);

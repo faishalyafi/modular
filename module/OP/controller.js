@@ -1,10 +1,10 @@
-const OP = require("../model/opModel");
-const masterBarang = require("../model/masterBarangModel");
+const OP = require("./model");
+const masterBarang = require("../masterBarang/model");
 const { v4: uuid_v4 } = require("uuid");
 const sq = require("../config/connection");
 const moment = require("moment");
 const subOP = require("../model/subOPModel");
-const masterPiutang = require("../module/masterPiutang/model");
+const masterPiutang = require("../masterPiutang/model");
 const { DatabaseError } = require("pg-protocol"); 
 
 class Controller {

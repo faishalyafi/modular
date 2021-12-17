@@ -1,6 +1,6 @@
 const router = require("express").Router();
-const user = require("./user");
-const log = require("./log");
+const user = require("../module/masterUser/route");
+const log = require("../module/log/route");
 const unit = require("./unit");
 const customerCategory = require("./customerCategory");
 const customer = require("./customer");
@@ -10,7 +10,7 @@ const masterSupplier = require("./masterSupplier");
 const pic = require("./pic");
 const bank = require("../module/masterBank/route");
 const PO = require("../module/PO/route");
-const OP = require("./OP");
+const OP = require("../module/OP/route");
 const masterPengiriman = require("./masterPengiriman");
 const gudang = require("../module/gudang/route");
 const transaksiPO = require("../module/transaksiPO/route");
