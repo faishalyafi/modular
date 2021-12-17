@@ -1,5 +1,5 @@
 const customer = require('../model/customerModel');
-const poolHargaJualModel = require('../model/poolHargaJualModel');
+const poolHargaJualModel = require('../module/poolHargaJual/model');
 const { v4: uuid_v4 } = require('uuid');
 const sq = require("../config/connection");
 
