@@ -1,6 +1,6 @@
-const Controller = require("../controller/stockKeluarController");
+const Controller = require("./controller");
 const router = require("express").Router();
-const authentification = require("../middleware/authentification");
+const authentification = require("../../middleware/authentification");
 
 router.post("/register", authentification, Controller.register);
 router.post("/update", authentification, Controller.update);
