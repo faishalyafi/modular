@@ -1,7 +1,7 @@
-const formula = require("../model/formulaModel");
-const subFormula = require("../model/subFormulaModel");
+const formula = require("./model");
+const subFormula = require("../subFormula/model");
 const { v4: uuid_v4 } = require("uuid");
-const sq = require("../config/connection");
+const sq = require("../../config/connection");
 
 class Controller {
   static register(req, res) {
