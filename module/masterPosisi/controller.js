@@ -1,6 +1,6 @@
-const masterPosisi = require("../model/masterPosisiModel");
+const masterPosisi = require("./model");
 const { v4: uuid_v4 } = require("uuid");
-const sq = require("../config/connection");
+const sq = require("../../config/connection");
 
 class Controller {
     static register(req, res) {
