@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const sq = require("../config/connection");
 
 const produksi = require("../model/produksiModel");
-const stock = require("../model/stockModel");
+const stock = require("../module/stock/model");
 const masterBarang = require("../model/masterBarangModel");
 const user = require("../model/userModel");
 

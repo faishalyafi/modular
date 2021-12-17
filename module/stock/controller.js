@@ -1,6 +1,6 @@
-const stock = require("../model/stockModel");
+const stock = require("./model");
 const { v4: uuid_v4 } = require("uuid");
-const sq = require("../config/connection");
+const sq = require("../../config/connection");
 
 class Controller {
     static async listAllstock(req,res){
@@ -27,14 +27,14 @@ class Controller {
     }
     static async listDetailsBatchBarang(req,res){
         const{gudangId,masterBarangId}=req.params
-        console.log(req.params);
+        // console.log(req.params);
         let data = await sq.query(`select g.id as "IdGudang",g."namaGudang" ,mb.id as "idMasterBarang",mb."namaBarang",s."batchNumber",sum(s."jumlahStock") as "jumlahBarangPerBatch" from stock s
         join gudang g on s."gudangId" =g.id
-                join "masterBarang" mb on s."masterBarangId" =mb.id
-                where mb."deletedAt" isnull and s."deletedAt" isnull 
-                and g.id ='${gudangId}' and mb.id='${masterBarangId}'
-                group by g.id,g."namaGudang" ,mb.id,mb."namaBarang",s."batchNumber"
-                order by mb."namaBarang" `);
+        join "masterBarang" mb on s."masterBarangId" =mb.id
+        where mb."deletedAt" isnull and s."deletedAt" isnull 
+        and g.id ='${gudangId}' and mb.id='${masterBarangId}'
+        group by g.id,g."namaGudang" ,mb.id,mb."namaBarang",s."batchNumber"
+        order by mb."namaBarang" `);
         res.status(200).json({status:200,message:"sukses",data:data[0]});
     }
     static async listSearch(req,res){

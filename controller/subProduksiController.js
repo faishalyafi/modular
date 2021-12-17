@@ -1,6 +1,6 @@
 const { v4: uuid_v4 } = require("uuid");
 const sq = require("../config/connection");
-const stock = require("../model/stockModel");
+const stock = require("../module/stock/model");
 const subProduksiM = require("../model/subProduksiModel");
 const masterBarang = require("../model/masterBarangModel");
 const moment = require("moment");

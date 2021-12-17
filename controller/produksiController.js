@@ -1,9 +1,8 @@
 const produksiModel = require("../model/produksiModel");
 const { v4: uuid_v4 } = require("uuid");
 const sq = require("../config/connection");
-const stock = require("../model/stockModel");
+const stock = require("../module/stock/model");
 const moment = require("moment");
-// const subProduksiM = require("../model/subProduksiModel");
 const masterBarang = require("../model/masterBarangModel");
 
 class Controller {

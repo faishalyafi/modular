@@ -1,6 +1,6 @@
-const Controller = require("../controller/stockController");
+const Controller = require("./controller");
 const router = require("express").Router();
-const authentification = require("../middleware/authentification");
+const authentification = require("../../middleware/authentification");
 
 
 router.get("/listAllStock", authentification, Controller.listAllstock);
