@@ -1,6 +1,6 @@
 const kelengkapanLamaran = require("../model/kelengkapanLamaranModel");
 const riwayatPendidikan = require("../model/riwayatPendidikan");
-const pengalamanKerja = require("../model/pengalamanKerjaModel");
+const pengalamanKerja = require("../module/pengalamanKerja/model");
 const { v4: uuid_v4 } = require("uuid");
 const sq = require("../config/connection");
 const { Sequelize } = require('sequelize');
