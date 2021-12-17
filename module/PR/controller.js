@@ -1,11 +1,11 @@
-const PR = require("../model/PRModel");
-const CC = require("../module/poCC/model");
-const subPR = require("../model/subPRModel");
-const poolHargaSupplier = require("../model/poolHargaSupplierModel");
+const PR = require("./model");
+const CC = require("../poCC/model");
+const subPR = require("../subPR/subPRModel");
+const poolHargaSupplier = require("../../model/poolHargaSupplierModel");
 const { v4: uuid_v4 } = require("uuid");
-const sq = require("../config/connection");
-const PO = require("../module/PO/model");
-const subPO = require("../module/subPO/model");
+const sq = require("../../config/connection");
+const PO = require("../PO/model");
+const subPO = require("../subPO/model");
 const moment = require("moment");
 
 
