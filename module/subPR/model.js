@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sq = require("../../config/connection");
 const PR = require("../PR/model");
-const barang = require("../../model/masterBarangModel");
+const barang = require("../masterBarang/model");
 
 const subPR = sq.define(
   "subPR",

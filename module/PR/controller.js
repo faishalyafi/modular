@@ -1,7 +1,7 @@
 const PR = require("./model");
 const CC = require("../poCC/model");
-const subPR = require("../subPR/subPRModel");
-const poolHargaSupplier = require("../../model/poolHargaSupplierModel");
+const subPR = require("../subPR/model");
+const poolHargaSupplier = require("../poolHargaSupplier/model");
 const { v4: uuid_v4 } = require("uuid");
 const sq = require("../../config/connection");
 const PO = require("../PO/model");

@@ -1,5 +1,5 @@
-const user = require('../user/controller')
-const customer = require('../../model/customerModel')
+const user = require('../masterUser/controller')
+const customer = require('../masterCustomer/model')
 const sq = require('../../config/connection')
 const { v4: uuid_v4 } = require("uuid");
 const moment= require('moment')

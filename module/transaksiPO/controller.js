@@ -1,7 +1,7 @@
 const transaksiPO = require("./model");
 const subTransaksiPO = require("../subTransaksiPO/model");
 const stock = require("../stock/model");
-const masterBarang = require("../../model/masterBarangModel");
+const masterBarang = require("../masterBarang/model");
 
 const { v4: uuid_v4 } = require("uuid");
 const sq = require("../../config/connection");

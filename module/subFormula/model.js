@@ -1,6 +1,6 @@
 const {DataTypes} = require( 'sequelize' );
 const sq = require( '../../config/connection' );
-const masterBarang =  require("../../model/masterBarangModel")
+const masterBarang =  require("../masterBarang/model")
 const formula =  require("../formula/model")
 
 const subFormula = sq.define( 'subFormula', {

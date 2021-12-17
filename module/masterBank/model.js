@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sq = require("../../config/connection");
-const customer = require("../../model/customerModel");
-const supplier = require("../../model/masterSupplierModel");
+const customer = require("../masterCustomer/model");
+const supplier = require("../masterSupplier/model");
 
 const masterBank = sq.define(
   "masterBank",

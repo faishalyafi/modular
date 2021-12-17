@@ -17,7 +17,7 @@ const transaksiPO = require("../module/transaksiPO/route");
 const transaksiOP = require("./transaksiOP");
 const stock = require("../module/stock/route");
 const report = require("./report");
-const produksi = require("../module/produksi/produksi");
+const produksi = require("../module/produksi/route");
 const subProduksi = require("../module/subProduksi/route");
 const formula = require("../module/formula/route");
 const salesMobile=require('../module/salesMobile/route');
@@ -40,7 +40,6 @@ const masterTahapan = require("../module/masterTahapan/route");
 const poolTahapan = require("../module/poolTahapan/route");
 const masterPiutang = require("../module/masterPiutang/route");
 const masterBayar = require("../module/masterBayar/route");
-
 
 router.use("/user", user);
 router.use("/log", log);
@@ -83,7 +82,5 @@ router.use('/masterTahapan', masterTahapan);
 router.use('/poolTahapan', poolTahapan);
 router.use('/masterPiutang', masterPiutang);
 router.use('/masterBayar', masterBayar);
-
-
 
 module.exports = router;

@@ -1,4 +1,4 @@
-const produksiModel = require("./produksiModel");
+const produksiModel = require("./model");
 const { v4: uuid_v4 } = require("uuid");
 const sq = require("../../config/connection");
 const stock = require("../../module/stock/model");

@@ -1,10 +1,10 @@
 const { DataTypes } = require("sequelize");
 const sq = require("../../config/connection");
 
-const produksi = require("../../module/produksi/produksiModel");
+const produksi = require("../produksi/model");
 const stock = require("../stock/model");
 const masterBarang = require("../masterBarang/model");
-const user = require("../user/model");
+const user = require("../masterUser/model");
 
 const subProduksi = sq.define(
   "subProduksi",

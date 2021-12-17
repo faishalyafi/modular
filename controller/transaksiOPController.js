@@ -4,7 +4,7 @@ const { v4: uuid_v4 } = require("uuid");
 const sq = require("../config/connection");
 const moment = require("moment");
 const stock = require("../module/stock/model");
-const masterBarang = require("../model/masterBarangModel");
+const masterBarang = require("../module/masterBarang/model");
 
 class Controller {
   static async generateNoDO(req, res) {

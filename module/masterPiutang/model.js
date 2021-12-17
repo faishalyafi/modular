@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sq = require('../../config/connection');
-const OP = require('../../model/opModel');
+const OP = require('../OP/model');
 
 const masterPiutang = sq.define('masterPiutang', {
     id: {

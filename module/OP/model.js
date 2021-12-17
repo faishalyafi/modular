@@ -1,13 +1,7 @@
 const { DataTypes } = require("sequelize");
-<<<<<<< HEAD:module/OP/model.js
 const sq = require("../../config/connection");
 const custommer = require("../masterCustomer/model");
 const user = require("../masterUser/model");
-=======
-const sq = require("../config/connection");
-const custommer = require("./customerModel");
-const user = require("../module/user/model");
->>>>>>> c18e09ce7879a1c5ed657d0ceb77d799163e8261:model/opModel.js
 
 const OP = sq.define(
   "OP",

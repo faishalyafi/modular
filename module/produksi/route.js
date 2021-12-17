@@ -1,4 +1,4 @@
-const Controller = require("./produksiController.js");
+const Controller = require("./controller");
 const router = require("express").Router();
 const authentification = require("../../middleware/authentification");
 
