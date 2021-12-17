@@ -1,9 +1,9 @@
 const OP = require("./model");
 const masterBarang = require("../masterBarang/model");
 const { v4: uuid_v4 } = require("uuid");
-const sq = require("../config/connection");
+const sq = require("../../config/connection");
 const moment = require("moment");
-const subOP = require("../model/subOPModel");
+const subOP = require("../subOP/model");
 const masterPiutang = require("../masterPiutang/model");
 const { DatabaseError } = require("pg-protocol"); 
 
@@ -192,7 +192,7 @@ class Controller {
     });
   }
 
-  static async listBarangOPByNoOP(req,res){
+  static async listBarangOPByNoOP(req, res) {
     const { nomorOP, kategoriHargaId } = req.body;
     // let data = await sq.query(`select so.id as "subOPId",so."jumlahBarangSubOP", so."hargaBeliOP",so."totalHargaPerBarangOP",so."OPId",o."nomorOP",so."masterBarangId",mb."namaBarang",mb.barcode,mb."kodeBarang",mb."jumlahTotalBarang",o."totalHargaOP", o."statusOP",mkh."kategoriToko",phj."hargaJual",(select sum(s."jumlahStock") as "totalStock" from stock s where s."deletedAt" isnull and s."masterBarangId"=mb.id) from "subOP" so join "masterBarang" mb on mb.id = so."masterBarangId" join "OP" o on o.id = so."OPId" join "poolHargaJual" phj on phj."masterBarangId" = mb.id join "masterKategoriHarga" mkh on mkh.id = phj."masterKategoriHargaId" where so."deletedAt" isnull and o."deletedAt" isnull and mb."deletedAt" isnull and o."nomorOP" = '${nomorOP}' and phj."masterKategoriHargaId" = '${kategoriHargaId}' order by so."createdAt" `);
     let data = await sq.query(`select so.id as "subOPId",so."jumlahBarangSubOP", so."hargaBeliOP",so."totalHargaPerBarangOP",so."OPId",o."nomorOP",so."masterBarangId",mb."namaBarang",mb.barcode,mb."kodeBarang",mb."jumlahTotalBarang",o."totalHargaOP", o."statusOP",mkh."kategoriToko",phj."hargaJual",(select sum(s."jumlahStock") as "totalStock" from stock s where s."deletedAt" isnull and s."masterBarangId"=mb.id),(select sum(so2."jumlahBarangSubOP") as "jumlahTotalSubOP" from "subOP" so2 join "OP" o2 on o2.id=so2."OPId" where so2."deletedAt" isnull and o2."deletedAt" isnull and o2.id=o.id) from "subOP" so join "OP" o ON o.id = so."OPId" join "masterBarang" mb ON mb.id = so."masterBarangId" join "masterCustomer" mc on mc.id = o."masterCustomerId" join "poolHargaJual" phj on phj ."masterBarangId" = mb.id join "masterKategoriHarga" mkh on mkh.id = phj."masterKategoriHargaId" where so."deletedAt" isnull and mb."deletedAt" isnull and o."deletedAt" isnull and  mb."deletedAt" isnull and mc."deletedAt" isnull and phj."deletedAt" isnull and mkh."deletedAt" isnull and o."nomorOP" = '${nomorOP}' and phj."masterKategoriHargaId" = '${kategoriHargaId}' order by so."createdAt"`);
@@ -204,10 +204,10 @@ class Controller {
     let jmlBonus = 0;
     let jmlBarang = 0;
     for (let i = 0; i < TOP[0].length; i++) {
-      if(TOP[0].isBonus){
-        jmlBonus+=TOP[0][i].jumlahBarangOP;
-      }else{
-        jmlBarang+=TOP[0][i].jumlahBarangOP
+      if (TOP[0].isBonus) {
+        jmlBonus += TOP[0][i].jumlahBarangOP;
+      } else {
+        jmlBarang += TOP[0][i].jumlahBarangOP
       }
     }
     // console.log(jmlBonus);
@@ -217,7 +217,7 @@ class Controller {
       data[0][j].TotalBarangBonusTransaksiOP = jmlBonus;
     }
     // console.log(data[0]);
-    res.status(200).json({status:200,message:"sukses",data:data[0]})
+    res.status(200).json({ status: 200, message: "sukses", data: data[0] })
   }
 
   static async list(req, res) {
@@ -291,8 +291,8 @@ class Controller {
     let tanggal = moment(tgl[0][0].current_date).format('YYYY-MM-DD')
     let t = new Date(tanggal);
     console.log(t)
-    console.log(typeof(t));
-    
+    console.log(typeof (t));
+
     let data = await sq.query(`
     select o.id as "OPId",o."masterCustomerId",o."nomorOP" ,o."tanggalOrderOP",o."metodePembayaranOP" ,o."TOPPenjualanOP" ,o."keteranganPenjualanOP" ,o."PPNPenjualanOP",o."totalHargaOP",sum(so."jumlahBarangSubOP") as "totalBarangSubOP",mc."namaCustomer",o."masterUserId", mu.nama as "namaUser" 
       from "subOP" so join "OP" o ON so."OPId" = o.id 
@@ -359,14 +359,21 @@ class Controller {
   }
 
   static acceptedOP(req, res) {
-    const { idOP, statusOP, piutangAwal, sisaPiutang, TOPPiutang, statusPiutang } = req.body;
+    const { idOP, statusOP, tanggalPiutang } = req.body;
     OP.update({ statusOP }, { where: { id: idOP } }).then((data2) => {
-      if (statusOP == 1) {
-        masterPiutang.create({id: uuid_v4(),piutangAwal, sisaPiutang, TOPPiutang, statusPiutang, OPId: idOP})
-        .then((data2) => {
-          res.status(200).json({ status: 200, message: "sukses" });
+      OP.findAll({
+        where: { id: idOP }
+      })
+        .then((data3) => {
+          if (data3[0].metodePembayaranOP == "kredit") {
+            masterPiutang.create({ id: uuid_v4(), piutangAwal: data3[0].totalHargaOP, sisaPiutang: data3[0].totalHargaOP, TOPPiutang: data3[0].TOPPenjualanOP, statusPiutang: 0,tanggalPiutang, OPId: idOP })
+              .then((data2) => {
+                res.status(200).json({ status: 200, message: "sukses" });
+              })
+          } else if (data3[0].metodePembayaranOP == "tunai") {
+            res.status(200).json({ status: 200, message: "sukses" });
+          }
         })
-      }
     }).catch((err) => {
       res.status(500).json({ status: 500, message: "gagal", data: err });
     });
@@ -478,14 +485,12 @@ class Controller {
     res.status(200).json({ status: 200, message: "sukses", data: hasil });
   }
 
-  static async grafikPenjualanPertahun(req,res){
-    const{tahun}= req.params
-    let data = await sq.query(`select date_part('month',o."tanggalOrderOP") as bulan ,sum(o."totalHargaOP") from "OP" o where date_part('year',o."tanggalOrderOP") = ${tahun} and o."deletedAt" isnull group by bulan `) 
+  static async grafikPenjualanPertahun(req, res) {
+    const { tahun } = req.params
+    let data = await sq.query(`select date_part('month',o."tanggalOrderOP") as bulan ,sum(o."totalHargaOP") from "OP" o where date_part('year',o."tanggalOrderOP") = ${tahun} and o."deletedAt" isnull group by bulan `)
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
-  
 }
-
 module.exports = Controller;
 
 
