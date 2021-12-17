@@ -1,4 +1,4 @@
-const user = require('../../controller/userController')
+const user = require('../user/controller')
 const customer = require('../../model/customerModel')
 const sq = require('../../config/connection')
 const { v4: uuid_v4 } = require("uuid");

@@ -1,7 +1,7 @@
 const { DataTypes } = require( 'sequelize' );
 const sq = require( '../config/connection' );
 const masterCustomerCategory = require( '../model/customerCategoryModel');
-const user = require('../model/userModel')
+const user = require('../module/user/model')
 const masterKategoriHarga = require('../model/masterKategoriHargaModel');
 const kelurahan = require('../module/kelurahan/model');
 const kecamatan = require('../module/kecamatan/model');

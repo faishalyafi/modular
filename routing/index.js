@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const user = require("./user");
+const user = require("../module/user/route");
 const log = require("./log");
 const unit = require("./unit");
 const customerCategory = require("./customerCategory");

@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sq =  require('../config/connection');
-const user= require('./userModel')
+const user= require('../module/user/model')
 
 const log = sq.define('log',{
     id:{

@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sq = require("../config/connection");
 const OP = require("./opModel");
-const user =  require("./userModel");
+const user =  require("../module/user/model");
 
 const transaksiOP = sq.define(
   "transaksiOP",

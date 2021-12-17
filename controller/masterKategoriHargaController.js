@@ -1,5 +1,5 @@
 const masterKategoriHarga = require("../model/masterKategoriHargaModel");
-const poolHargaJual = require("../model/poolHargaJualModel");
+const poolHargaJual = require("../module/poolHargaJual/model");
 
 const { v4: uuid_v4 } = require("uuid");
 const sq = require("../config/connection");
