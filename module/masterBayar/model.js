@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize');
-const sq = require('../config/connection');
-const masterPiutang = require('./masterPiutangModel');
-const masterUser = require('./userModel');
-const masterBank = require('./bankModel');
+const sq = require('../../config/connection');
+const masterPiutang = require('../masterPiutang/model');
+const masterUser = require('../masterUser/model');
+const masterBank = require('../masterBank/model');
 
 const masterBayar = sq.define('masterBayar', {
     id: {

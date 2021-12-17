@@ -39,6 +39,7 @@ const PR = require("../module/PR/route");
 const masterTahapan = require("../module/masterTahapan/route");
 const poolTahapan = require("../module/poolTahapan/route");
 const masterPiutang = require("../module/masterPiutang/route");
+const masterBayar = require("../module/masterBayar/route");
 
 
 router.use("/user", user);
@@ -81,6 +82,7 @@ router.use('/pengalamanKerja', pengalamanKerja);
 router.use('/masterTahapan', masterTahapan);
 router.use('/poolTahapan', poolTahapan);
 router.use('/masterPiutang', masterPiutang);
+router.use('/masterBayar', masterBayar);
 
 
 
