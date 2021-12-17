@@ -1,9 +1,5 @@
 const {verifyToken} = require('../helper/jwt')
-<<<<<<< HEAD
 const user = require('../module/masterUser/model')
-=======
-const user = require('../module/user/model')
->>>>>>> c18e09ce7879a1c5ed657d0ceb77d799163e8261
 
 async function authentification(req,res,next){
     
