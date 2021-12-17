@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
-const sq = require('../config/connection');
-const loker = require('../model/lokerModel');
+const sq = require('../../config/connection');
+const loker = require('../../model/lokerModel');
 
 const postLoker = sq.define('postLoker', {
     id: {

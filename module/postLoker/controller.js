@@ -1,7 +1,7 @@
-const postLoker = require("../model/postLokerModel");
-const kirimEmail = require("../helper/kirimEmail");
+const postLoker = require("./model");
+const kirimEmail = require("../../helper/kirimEmail");
 const { v4: uuid_v4 } = require("uuid");
-const sq = require("../config/connection");
+const sq = require("../../config/connection");
 
 class Controller {
     static register(req, res) {

@@ -1,5 +1,5 @@
 const poolTahapan = require("./model");
-const postLoker=require("../../model/postLokerModel")
+const postLoker=require("../postLoker/model")
 const { v4: uuid_v4 } = require("uuid");
 const sq = require("../../config/connection");
 
