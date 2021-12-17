@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
-const sq = require("../config/connection");
-const supplier = require("./masterSupplierModel");
-const divisi = require("./masterDivisiModel");
+const sq = require("../../config/connection");
+const supplier = require("../../model/masterSupplierModel");
+const divisi = require("../../model/masterDivisiModel");
 
 const PR = sq.define(
   "PR",
