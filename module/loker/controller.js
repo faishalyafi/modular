@@ -1,6 +1,6 @@
-const loker = require("../model/lokerModel");
+const loker = require("./model");
 const { v4: uuid_v4 } = require("uuid");
-const sq = require("../config/connection");
+const sq = require("../../config/connection");
 
 class Controller {
   static register(req, res) {
