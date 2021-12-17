@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sq = require('../../config/connection');
-const kelengkapanLamaran = require('../../model/kelengkapanLamaranModel');
+const kelengkapanLamaran = require('../kelengkapanLamaran/model');
 
 const riwayatPendidikan = sq.define('riwayatPendidikan', {
     id: {
