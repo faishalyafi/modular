@@ -1,7 +1,7 @@
-const poolTahapan = require("../model/poolTahapanModel");
-const postLoker=require("../model/postLokerModel")
+const poolTahapan = require("./model");
+const postLoker=require("../../model/postLokerModel")
 const { v4: uuid_v4 } = require("uuid");
-const sq = require("../config/connection");
+const sq = require("../../config/connection");
 
 class Controller {
   static register(req, res) {
