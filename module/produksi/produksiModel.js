@@ -1,9 +1,9 @@
 const { DataTypes } = require("sequelize");
-const sq = require("../config/connection");
+const sq = require("../../config/connection");
 
-const formula = require("./formulaModel");
-const user = require("./userModel");
-const gudang = require("../module/gudang/model");
+const formula = require("../../module/formula/model");
+const user = require("../../model/userModel");
+const gudang = require("../../module/gudang/model");
 
 const produksi = sq.define(
   "produksi",

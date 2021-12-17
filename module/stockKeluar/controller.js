@@ -1,7 +1,7 @@
-const stockKeluar = require("../model/stockKeluarModel");
-const stock = require("../module/stock/model");
-const masterBarang = require("../model/masterBarangModel");
-const sq = require("../config/connection");
+const stockKeluar = require("./model");
+const stock = require("../stock/model");
+const masterBarang = require("../masterBarang/model");
+const sq = require("../../config/connection");
 const { v4: uuid_v4 } = require("uuid");
 
 class Controller {
