@@ -3,10 +3,10 @@ const sq = require( '../config/connection' );
 const masterCustomerCategory = require( '../model/customerCategoryModel');
 const user = require('../model/userModel')
 const masterKategoriHarga = require('../model/masterKategoriHargaModel');
-const kelurahan = require('../model/kelurahanModel');
-const kecamatan = require('../model/kecamatanModel');
-const kota = require('../model/kotaModel');
-const provinsi = require('../model/provinsiModel');
+const kelurahan = require('../module/kelurahan/model');
+const kecamatan = require('../module/kecamatan/model');
+const kota = require('../module/kota/model');
+const provinsi = require('../module/provinsi/model');
 
 const masterCustomer = sq.define( 'masterCustomer', {
 	id: {
