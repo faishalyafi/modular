@@ -1,6 +1,6 @@
-const Controller = require("../controller/produksiController.js");
+const Controller = require("./produksiController.js");
 const router = require("express").Router();
-const authentification = require("../middleware/authentification");
+const authentification = require("../../middleware/authentification");
 
 router.post("/register", authentification, Controller.register);
 router.get("/list", authentification, Controller.list);
