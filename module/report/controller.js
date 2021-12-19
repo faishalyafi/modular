@@ -1,51 +1,9 @@
-const sq = require("../config/connection");
+const sq = require("../../config/connection");
 const ExcelJS = require("exceljs");
 const moment = require("moment");
 
 class Controller {
-  // static async reportsByNomorPO(req, res) {
-  //   const { nomorPO } = req.params;
-  //   let data = await sq.query(
-  //     `select * from "subPO" sp join "PO" p ON p.id = sp."POId" join "masterBarang" mb on mb.id = sp."masterBarangId" join "masterSupplier" ms on ms.id = p."masterSupplierId" where sp."deletedAt" isnull and p."deletedAt" isnull and mb."deletedAt" isnull and ms."deletedAt" isnull and p."nomorPO" = '${nomorPO}'`
-  //   );
-  //   // res.status(200).JSON({status:200,message:"sukses",data:data[0]});
-  //   // res.render('reportPO.ejs',{data: JSON.stringify(data[0])});
-  //   // console.log(data[0]);
-  //   const workbook = new ExcelJS.Workbook();
-  //   const sheet = workbook.addWorksheet("Serova");
-
-  //   let c = [
-  //     { header: "Jumlah", key: "jumlah", width: 10 },
-  //     { header: "Harga Beli", key: "hargaBeli", width: 10 },
-  //   ];
-  //   // console.log(x);
-  //   sheet.columns = c;
-  //   let isi = [
-  //     { jumlah: 200, hargaBeli: 50000 },
-  //     { jumlah: 70, hargaBeli: 900 },
-  //   ];
-
-  //   for (let i = 0; i < isi.length; i++) {
-  //     sheet.addRow(isi[i]);
-  //   }
-
-  //   sheet.getCell("A1").border = {
-  //     top: { style: "thick" },
-  //     left: { style: "thick" },
-  //     bottom: { style: "thick" },
-  //     right: { style: "thick" },
-  //   };
-
-  //   let fileName = "coba.xlsx";
-  //   res.setHeader(
-  //     "Content-Type",
-  //     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-  //   );
-  //   res.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-  //   await workbook.xlsx.write(res);
-  //   res.end();
-  // }
-
+  
   static async reportCustomer(req, res) {
     // const {val}= req.params;
     // let hasil = `and mc."namaCustomer" ilike '${val}%'`

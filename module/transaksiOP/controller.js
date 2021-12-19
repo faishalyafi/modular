@@ -1,10 +1,10 @@
-const transaksiOP = require("../model/transaksiOPModel");
-const subTransaksiOP = require("../model/subTransaksiOP");
+const transaksiOP = require("./model");
+const subTransaksiOP = require("../subTransaksiOP/model");
 const { v4: uuid_v4 } = require("uuid");
-const sq = require("../config/connection");
+const sq = require("../../config/connection");
 const moment = require("moment");
-const stock = require("../module/stock/model");
-const masterBarang = require("../module/masterBarang/model");
+const stock = require("../stock/model");
+const masterBarang = require("../masterBarang/model");
 
 class Controller {
   static async generateNoDO(req, res) {

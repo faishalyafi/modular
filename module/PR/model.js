@@ -1,7 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sq = require("../../config/connection");
-const supplier = require("../masterSupplier/model");
-const divisi = require("../../model/masterDivisiModel");
+const divisi = require("../masterDivisi/model");
 
 const PR = sq.define(
   "PR",
@@ -16,31 +15,7 @@ const PR = sq.define(
     tanggalPR: {
       type: DataTypes.DATE,
     },
-    rencanaTglKedatanganPR: {
-      type: DataTypes.DATE,
-    },
-    pembayaranPR: {
-      type: DataTypes.STRING,
-    },
-    TOPPR: {
-      type: DataTypes.STRING,
-    },
-    metodePengirimanPR: {
-      type: DataTypes.STRING,
-    },
-    totalHargaPR: {
-      type: DataTypes.DOUBLE,
-    },
     keteranganPR: {
-      type: DataTypes.STRING,
-    },
-    PPNPR: {
-      type: DataTypes.INTEGER,
-    },
-    promoPR: {
-      type: DataTypes.STRING,
-    },
-    revPR: {
       type: DataTypes.STRING,
     },
     statusPR:{
@@ -53,8 +28,6 @@ const PR = sq.define(
     freezeTableName: true,
   }
 );
-PR.belongsTo(supplier);
-supplier.hasMany(PR);
 
 PR.belongsTo(divisi);
 divisi.hasMany(PR);

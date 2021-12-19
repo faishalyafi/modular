@@ -1,7 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sq = require("../../config/connection");
 const PO = require("../PO/model");
-const PR = require("../PR/model");
 
 const poCC = sq.define(
   "poCC",
@@ -22,9 +21,6 @@ const poCC = sq.define(
 
 poCC.belongsTo(PO);
 PO.hasMany(poCC);
-
-poCC.belongsTo(PR);
-PR.hasMany(poCC);
 
 
 module.exports = poCC;
