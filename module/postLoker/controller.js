@@ -1,9 +1,9 @@
-const postLoker = require("../model/postLokerModel");
-const kebutuhanLoker = require("../model/kebutuhanLokerModel");
-const kebutuhanPelamar = require("../model/kebutuhanPelamarModel");
-const kirimEmail = require("../helper/kirimEmail");
+const postLoker = require("../postLoker/model");
+const kebutuhanLoker = require("../kebutuhanLoker/model");
+const kebutuhanPelamar = require("../kebutuhanPelamar/model");
+const kirimEmail = require("../../helper/kirimEmail");
 const { v4: uuid_v4 } = require("uuid");
-const sq = require("../config/connection");
+const sq = require("../../config/connection");
 
 class Controller {
     static register(req, res) {
@@ -15,31 +15,32 @@ class Controller {
             }
         }
         kebutuhanLoker.findAll({
-            where: { lokerId }
+            where: {lokerId}
         })
-            .then((data) => {
-                postLoker
-                    .create({ id: uuid_v4(), namaPengirim, emailPengirim, alamatPengirim, statusPostLoker, lokerId, CV: fileCV })
-                    .then((data1) => {
-                        kirimEmail.kirim(data1.emailPengirim);
-                        let bulkKebutuhanPelamar = [];
-                        for (let i = 0; i < data.length; i++) {
-                            bulkKebutuhanPelamar.push({
-                                id: uuid_v4(),
-                                postLokerId: data1.id,
-                                masterKebutuhanId: data[i].masterKebutuhanId,
-                                statusKebutuhan: 0
-                            })
-                        }
-                        kebutuhanPelamar.bulkCreate(bulkKebutuhanPelamar)
-                            .then((data2) => {
-                                res.status(200).json({ status: 200, message: "sukses", });
-                            })
-                            .catch((err) => {
-                                res.status(500).json({ status: 500, message: "gagal", data: err });
-                            });
+        .then((data) => {
+            postLoker
+                .create({ id: uuid_v4(), namaPengirim, emailPengirim, alamatPengirim, statusPostLoker, lokerId, CV: fileCV })
+                .then((data1) => {
+                    kirimEmail.kirim(data1.emailPengirim);
+                    let bulkKebutuhanPelamar = [];
+                    for (let i = 0; i < data.length; i++) {
+                        bulkKebutuhanPelamar.push({
+                            id: uuid_v4(),
+                            postLokerId: data1.id,
+                            masterKebutuhanId: data[i].masterKebutuhanId,
+                            statusKebutuhan: 0
+                        })
+                    }
+                    
+                    kebutuhanPelamar.bulkCreate(bulkKebutuhanPelamar)
+                    .then((data2) => {
+                        res.status(200).json({ status: 200, message: "sukses", });
                     })
-            })
+                })
+                .catch((err) => {
+                    res.status(500).json({ status: 500, message: "gagal", data: err });
+                });
+        })
     }
 
     static async list(req, res) {
@@ -126,7 +127,7 @@ class Controller {
     }
 
     static async detailListByStatus(req, res) {
-        let { statusPostLoker, postLokerId } = req.params;
+        let {statusPostLoker, postLokerId} = req.params;
         let kolomKelengkapan = "";
         let joinTable = "";
         if (statusPostLoker == 0) {
@@ -136,7 +137,7 @@ class Controller {
             kolomKelengkapan = `,kl.id as "kelengkapanLamaranId",kl."namaPelamar" ,kl."nomorKTPPelamar" ,kl."posisiLamaran" ,kl."tinggiBadanPelamar" ,kl."beratBadanPelamar" ,kl."agamaPelamar" ,kl."kebangsaanPelamar" ,kl."jenisKelaminPelamar" ,kl."statusPelamar" ,kl."tempatLahirPelamar" ,kl."tanggalLahirPelamar" ,kl."noHpPelamar" ,kl."emailPelamar" ,kl."alamatPelamar" ,kl."tanggalMasukLamaran" ,kl."daftarRiwayatHidup" ,kl."pasFoto4x6" ,kl."pasFoto3x4" ,kl."fotoCopyKTP" ,kl."fotoCopyKK" ,kl."fotoCopyIjazah" ,kl."fotoCopySuratSehat" ,kl."fotoCopySKCK" ,kl."kartuJKK" ,kl."statusKelengkapan" ,kl."createdAt" ,kl."updatedAt" ,kl."deletedAt" `;
             joinTable = `left join "kelengkapanLamaran" kl on kl."postLokerId" = pl.id  `;
         }
-
+        
         let data = await sq.query(`
         select pl.id as "postLokerId",pl."namaPengirim" ,pl."emailPengirim" ,pl."alamatPengirim" ,pl."statusPostLoker" ,pl."lokerId" ,l."namaLoker" ,l."masterPosisiId" ,mp."namaPosisi" ,pl."CV", pl."createdAt" ,pl."updatedAt" ,pl."deletedAt" ${kolomKelengkapan}
         from "postLoker" pl ${joinTable}
@@ -147,7 +148,7 @@ class Controller {
         and mp."deletedAt" isnull 
         and pl."statusPostLoker" = ${statusPostLoker} 
         and pl.id = '${postLokerId}'`);
-
+        
         let dataPL = data[0][0];
 
         let data2 = await sq.query(`
@@ -161,7 +162,7 @@ class Controller {
         from "pengalamanKerja" pk 
         where pk."kelengkapanLamaranId" = '${data[0][0].kelengkapanLamaranId}' 
         and pk."deletedAt" isnull `);
-
+        
         dataPL.riwayatPendidikan = data2[0];
         dataPL.pengalamanKerja = data3[0];
 
@@ -200,15 +201,14 @@ class Controller {
 
     static delete(req, res) {
         const { id } = req.body;
-        postLoker.destroy({ where: { id } }).then((data) => {
-            kebutuhanPelamar.destroy({ where: { postLokerId: id } })
-                .then((data2) => {
-                    res.status(200).json({ status: 200, message: "sukses" });
-                })
-                .catch((err) => {
-                    res.status(500).json({ status: 500, message: "gagal", data: err });
-                });
+        postLoker.destroy({ where: { id: id } }).then((data) => {
+            kebutuhanPelamar.destroy({ where: { postLokerId: id } }).then((data2) => {
+                res.status(200).json({ status: 200, message: "sukses" });
+            })
         })
+            .catch((err) => {
+                res.status(500).json({ status: 500, message: "gagal", data: err });
+            });
     }
 
     static async jumlahPelamarByLoker(req, res) {
@@ -225,14 +225,14 @@ class Controller {
     static async listKebutuhanByPostLokerId(req, res) {
         const { postLokerId } = req.params;
         let data = await sq.query(`
-            select kp."masterKebutuhanId" ,mk."namaKebutuhan" ,mk."createdAt" ,mk."updatedAt" ,mk."deletedAt" 
-            from "postLoker" pl 
-            join "kebutuhanPelamar" kp on kp."postLokerId" = pl.id 
-            join "masterKebutuhan" mk on mk.id = kp."masterKebutuhanId" 
-            where kp."postLokerId" = '${postLokerId}' 
-            and pl."deletedAt" isnull 
-            and kp."deletedAt" isnull 
-            and mk."deletedAt" isnull `);
+        select kp."masterKebutuhanId" ,mk."namaKebutuhan" ,mk."createdAt" ,mk."updatedAt" ,mk."deletedAt" 
+        from "postLoker" pl 
+        join "kebutuhanPelamar" kp on kp."postLokerId" = pl.id 
+        join "masterKebutuhan" mk on mk.id = kp."masterKebutuhanId" 
+        where kp."postLokerId" = '${postLokerId}' 
+        and pl."deletedAt" isnull 
+        and kp."deletedAt" isnull 
+        and mk."deletedAt" isnull `);
         res.status(200).json({ status: 200, message: "sukses", data: data[0] });
     }
 }

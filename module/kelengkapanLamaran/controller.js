@@ -7,7 +7,7 @@ const { Sequelize } = require('sequelize');
 const Op = Sequelize.Op;
 class Controller {
   static register(req, res) {
-    const { namaPelamar, nomorKTPPelamar, posisiLamaran, tinggiBadanPelamar, beratBadanPelamar, agamaPelamar, kebangsaanPelamar, jenisKelaminPelamar, statusPelamar, tempatLahirPelamar, tanggalLahirPelamar, noHpPelamar, emailPelamar, alamatPelamar, tanggalMasukLamaran, daftarRiwayatHidup, pasFoto4x6, pasFoto3x4, fotoCopyKTP, fotoCopyKK, fotoCopyIjazah, fotoCopySuratSehat, fotoCopySKCK, kartuJKK, postLokerId, statusKelengkapan, bulkPengalamanKerja, bulkRiwayatPendidikan } = req.body;
+    const { namaPelamar, nomorKTPPelamar, posisiLamaran, tinggiBadanPelamar, beratBadanPelamar, agamaPelamar, kebangsaanPelamar, jenisKelaminPelamar, statusPelamar, tempatLahirPelamar, tanggalLahirPelamar, noHpPelamar, emailPelamar, alamatPelamar, tanggalMasukLamaran,postLokerId, statusKelengkapan, bulkPengalamanKerja, bulkRiwayatPendidikan } = req.body;
     const idKelengkapanLamaran = uuid_v4();
     kelengkapanLamaran.findAll({
       where: {
@@ -17,7 +17,7 @@ class Controller {
       if (data.length) {
         res.status(200).json({ status: 200, message: "data sudah ada" });
       } else {
-        kelengkapanLamaran.create({ id: idKelengkapanLamaran, namaPelamar, nomorKTPPelamar, posisiLamaran, tinggiBadanPelamar, beratBadanPelamar, agamaPelamar, kebangsaanPelamar, jenisKelaminPelamar, statusPelamar, tempatLahirPelamar, tanggalLahirPelamar, noHpPelamar, emailPelamar, alamatPelamar, tanggalMasukLamaran, daftarRiwayatHidup, pasFoto4x6, pasFoto3x4, fotoCopyKTP, fotoCopyKK, fotoCopyIjazah, fotoCopySuratSehat, fotoCopySKCK, kartuJKK, postLokerId, statusKelengkapan, bulkPengalamanKerja, bulkRiwayatPendidikan }).then((data2) => {
+        kelengkapanLamaran.create({ id: idKelengkapanLamaran, namaPelamar, nomorKTPPelamar, posisiLamaran, tinggiBadanPelamar, beratBadanPelamar, agamaPelamar, kebangsaanPelamar, jenisKelaminPelamar, statusPelamar, tempatLahirPelamar, tanggalLahirPelamar, noHpPelamar, emailPelamar, alamatPelamar, tanggalMasukLamaran, postLokerId, statusKelengkapan, bulkPengalamanKerja, bulkRiwayatPendidikan }).then((data2) => {
           for (let i = 0; i < bulkPengalamanKerja.length; i++) {
             const idPengalamanKerja = uuid_v4();
             bulkPengalamanKerja[i].kelengkapanLamaranId = idKelengkapanLamaran;
@@ -58,8 +58,8 @@ class Controller {
   }
 
   static updateAll(req, res) {
-    const { id, namaPelamar, nomorKTPPelamar, posisiLamaran, tinggiBadanPelamar, beratBadanPelamar, agamaPelamar, kebangsaanPelamar, jenisKelaminPelamar, statusPelamar, tempatLahirPelamar, tanggalLahirPelamar, noHpPelamar, emailPelamar, alamatPelamar, tanggalMasukLamaran, daftarRiwayatHidup, pasFoto4x6, pasFoto3x4, fotoCopyKTP, fotoCopyKK, fotoCopyIjazah, fotoCopySuratSehat, fotoCopySKCK, kartuJKK, postLokerId, statusKelengkapan, bulkPengalamanKerja, bulkRiwayatPendidikan } = req.body;
-    kelengkapanLamaran.update({ namaPelamar, nomorKTPPelamar, posisiLamaran, tinggiBadanPelamar, beratBadanPelamar, agamaPelamar, kebangsaanPelamar, jenisKelaminPelamar, statusPelamar, tempatLahirPelamar, tanggalLahirPelamar, noHpPelamar, emailPelamar, alamatPelamar, tanggalMasukLamaran, daftarRiwayatHidup, pasFoto4x6, pasFoto3x4, fotoCopyKTP, fotoCopyKK, fotoCopyIjazah, fotoCopySuratSehat, fotoCopySKCK, kartuJKK, postLokerId, statusKelengkapan, bulkPengalamanKerja, bulkRiwayatPendidikan }, { where: { id }, returning: true }).then((data) => {
+    const { id, namaPelamar, nomorKTPPelamar, posisiLamaran, tinggiBadanPelamar, beratBadanPelamar, agamaPelamar, kebangsaanPelamar, jenisKelaminPelamar, statusPelamar, tempatLahirPelamar, tanggalLahirPelamar, noHpPelamar, emailPelamar, alamatPelamar, tanggalMasukLamaran, postLokerId, statusKelengkapan, bulkPengalamanKerja, bulkRiwayatPendidikan } = req.body;
+    kelengkapanLamaran.update({ namaPelamar, nomorKTPPelamar, posisiLamaran, tinggiBadanPelamar, beratBadanPelamar, agamaPelamar, kebangsaanPelamar, jenisKelaminPelamar, statusPelamar, tempatLahirPelamar, tanggalLahirPelamar, noHpPelamar, emailPelamar, alamatPelamar, tanggalMasukLamaran, postLokerId, statusKelengkapan, bulkPengalamanKerja, bulkRiwayatPendidikan }, { where: { id }, returning: true }).then((data) => {
       pengalamanKerja.destroy({ where: { kelengkapanLamaranId: id } }).then((data) => {
         for (let i = 0; i < bulkPengalamanKerja.length; i++) {
           const idPengalamanKerja = uuid_v4();
@@ -85,8 +85,8 @@ class Controller {
   }
 
   static update(req, res) {
-    const { id, namaPelamar, nomorKTPPelamar, posisiLamaran, tinggiBadanPelamar, beratBadanPelamar, agamaPelamar, kebangsaanPelamar, jenisKelaminPelamar, statusPelamar, tempatLahirPelamar, tanggalLahirPelamar, noHpPelamar, emailPelamar, alamatPelamar, tanggalMasukLamaran, daftarRiwayatHidup, pasFoto4x6, pasFoto3x4, fotoCopyKTP, fotoCopyKK, fotoCopyIjazah, fotoCopySuratSehat, fotoCopySKCK, kartuJKK, postLokerId } = req.body;
-    loker.update({ namaPelamar, nomorKTPPelamar, posisiLamaran, tinggiBadanPelamar, beratBadanPelamar, agamaPelamar, kebangsaanPelamar, jenisKelaminPelamar, statusPelamar, tempatLahirPelamar, tanggalLahirPelamar, noHpPelamar, emailPelamar, alamatPelamar, tanggalMasukLamaran, daftarRiwayatHidup, pasFoto4x6, pasFoto3x4, fotoCopyKTP, fotoCopyKK, fotoCopyIjazah, fotoCopySuratSehat, fotoCopySKCK, kartuJKK, postLokerId }, { where: { id }, returning: true }).then((data) => {
+    const { id, namaPelamar, nomorKTPPelamar, posisiLamaran, tinggiBadanPelamar, beratBadanPelamar, agamaPelamar, kebangsaanPelamar, jenisKelaminPelamar, statusPelamar, tempatLahirPelamar, tanggalLahirPelamar, noHpPelamar, emailPelamar, alamatPelamar, tanggalMasukLamaran, postLokerId } = req.body;
+    kelengkapanLamaran.update({ namaPelamar, nomorKTPPelamar, posisiLamaran, tinggiBadanPelamar, beratBadanPelamar, agamaPelamar, kebangsaanPelamar, jenisKelaminPelamar, statusPelamar, tempatLahirPelamar, tanggalLahirPelamar, noHpPelamar, emailPelamar, alamatPelamar, tanggalMasukLamaran,postLokerId }, { where: { id }, returning: true }).then((data) => {
       res.status(200).json({ status: 200, message: "sukses", data: data[1] });
     }).catch((err) => {
       res.status(500).json({ status: 500, message: "gagal", data: err });
@@ -104,11 +104,10 @@ class Controller {
 
   static async detailKelengkapan(req, res) {
     let data = await sq.query(`
-      select kl.id as "kelengkapanLamaranId",kl."namaPelamar" ,kl."nomorKTPPelamar" ,kl."posisiLamaran" ,kl."tinggiBadanPelamar" ,kl."beratBadanPelamar" ,kl."agamaPelamar" ,kl."kebangsaanPelamar" ,kl."jenisKelaminPelamar" ,kl."statusPelamar" ,kl."tempatLahirPelamar" ,kl."noHpPelamar" ,kl."emailPelamar" ,kl."alamatPelamar" ,kl."tanggalMasukLamaran" ,kl."daftarRiwayatHidup" ,kl."pasFoto4x6" ,kl."pasFoto3x4" ,kl."fotoCopyKTP" ,kl."fotoCopyKK" ,kl."fotoCopyIjazah" ,kl."fotoCopySuratSehat" ,kl."fotoCopySKCK" ,kl."kartuJKK",kl."statusKelengkapan" ,kl."postLokerId" ,pl."namaPengirim" ,pl."emailPengirim" ,pl."alamatPengirim" ,pl."statusPostLoker" ,pl."CV" ,pl."lokerId" ,kl."createdAt" ,kl."updatedAt" ,kl."deletedAt" 
-      from "kelengkapanLamaran" kl 
-      join "postLoker" pl on pl.id = kl."postLokerId" 
-      where kl."deletedAt" isnull 
-      and pl."deletedAt" isnull `);
+    select kl.id as "kelengkapanLamaranId",kl."namaPelamar" ,kl."nomorKTPPelamar" ,kl."posisiLamaran" ,kl."tinggiBadanPelamar" ,kl."beratBadanPelamar" ,kl."agamaPelamar" ,kl."kebangsaanPelamar" ,kl."jenisKelaminPelamar" ,kl."statusPelamar" ,kl."tempatLahirPelamar" ,kl."noHpPelamar" ,kl."emailPelamar" ,kl."alamatPelamar" ,kl."tanggalMasukLamaran"  ,kl."postLokerId" ,pl."namaPengirim" ,pl."emailPengirim" ,pl."alamatPengirim" ,pl."statusPostLoker" ,pl."CV" ,pl."lokerId" ,kl."createdAt" ,kl."updatedAt" ,kl."deletedAt" from "kelengkapanLamaran" kl 
+    join "postLoker" pl on pl.id = kl."postLokerId" 
+    where kl."deletedAt" isnull 
+    and pl."deletedAt" isnull`);
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
 }
