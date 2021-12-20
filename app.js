@@ -12,6 +12,7 @@ app.use(express.urlencoded({extended: false}))
 app.use(express.json())
 // app.use(express.static('asset/file'));
 // app.use(express.static('asset/pdf'));
+app.use(express.static('asset/kelengkapan'));
 app.use( '/asset/file', express.static( 'asset/file' ) );
 app.use( '/asset/pdf', express.static( 'asset/pdf' ) );
 

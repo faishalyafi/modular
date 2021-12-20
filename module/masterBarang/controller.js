@@ -7,58 +7,47 @@ class Controller {
     const {kodeBarang,namaBarang,barcode,masterKategoriBarangId,masterUnitId} = req.body;
     const id = uuid_v4();
     let foto = "";
-    if (req.files.file1) {
+    if (req.files) {
       if (req.files.file1[0]) {
         foto = req.files.file1[0].filename;
       }
     }
-    masterBarang
-      .create({id,kodeBarang,namaBarang,barcode,foto,masterKategoriBarangId,masterUnitId})
-      .then((respon) => {
+    masterBarang.create({id,kodeBarang,namaBarang,barcode,foto,masterKategoriBarangId,masterUnitId}).then((respon) => {
         res.status(200).json({ status: 200, message: "sukses", data: respon });
-      })
-      .catch((err) => {
+      }).catch((err) => {
         res.status(500).json({ status: 500, message: "gagal", data: err });
       });
   }
   static update(req, res) {
     const {id,kodeBarang,namaBarang,barcode,masterKategoriBarangId,masterUnitId} = req.body;
-    if (req.files.file1) {
+    if (req.files) {
       if (req.files.file1[0]) {
         const foto = req.files.file1[0].filename;
         masterBarang.update({ foto }, { where: { id: id } });
       }
     }
-    masterBarang
-      .update({kodeBarang,namaBarang,barcode,masterKategoriBarangId,masterUnitId},{ where: { id: id }, returning: true })
-      .then((data) => {
+    masterBarang.update({kodeBarang,namaBarang,barcode,masterKategoriBarangId,masterUnitId},{ where: { id: id }, returning: true }).then((data) => {
         res.status(200).json({ status: 200, message: "sukses", data: data[1][0] });
-      })
-      .catch((err) => {
+      }).catch((err) => {
         res.status(500).json({ status: 500, message: "gagal", data: err });
       });
   }
   static delete(req, res) {
     const { id } = req.body;
-    masterBarang.destroy({ where: { id } })
-      .then((data) => {
+    masterBarang.destroy({ where: { id } }).then((data) => {
         res.status(200).json({ status: 200, message: "sukses" });
-      })
-      .catch((err) => {
+      }).catch((err) => {
         res.status(500).json({ status: 500, message: "gagal",data:err });
       });
   }
   static async list(req, res) {
-    // let data = await sq.query(`select mb.id as "masterBarangId", * , (select sum(s."jumlahStock") as "jumlahStock" from stock s where s."masterBarangId" = mb.id group by s."masterBarangId") from "masterBarang" mb join "masterKategoriBarang" mkb on mb."masterKategoriBarangId" = mkb.id join "masterUnit" mu on mb."masterUnitId" = mu.id where mb."deletedAt" isnull and mkb."deletedAt" isnull and mu."deletedAt" isnull `);
     let data = await sq.query(`select mb.id as "masterBarangId",* from "masterBarang" mb join "masterKategoriBarang" mkb on mkb.id = mb."masterKategoriBarangId" join "masterUnit" mu on mu.id = mb."masterUnitId" where mb."deletedAt" isnull and mu."deletedAt" isnull and mkb."deletedAt" isnull `);
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
 
   static async detailsById(req, res) {
     const { id } = req.params;
-    let data =
-      await sq.query(`select mb.id as "masterBarangId", * , (select sum(s."jumlahStock") as "jumlahStock" from stock s where s."masterBarangId" = mb.id group by s."masterBarangId")
-      from "masterBarang" mb join "masterKategoriBarang" mkb on mb."masterKategoriBarangId" = mkb.id join "masterUnit" mu on mb."masterUnitId" = mu.id where mb."deletedAt" isnull and mkb."deletedAt" isnull and mu."deletedAt" isnull and mb.id = '${id}'`);
+    let data = await sq.query(`select mb.id as "masteBarangId",mb."kodeBarang",mb."namaBarang",mb.barcode, mb.foto,mb."jumlahTotalBarang",mb."masterKategoriBarangId",mkb."namaKategori",mb."masterUnitId",mu.satuan,mu."jumlahIsi" from "masterBarang" mb join "masterKategoriBarang" mkb on mkb.id = mb."masterKategoriBarangId" join "masterUnit" mu on mu.id = mb."masterUnitId" where mb."deletedAt" isnull and mkb."deletedAt" isnull and mu."deletedAt" isnull and mb.id='${id}'`);
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
 

@@ -1,6 +1,7 @@
 const kelengkapanLamaran = require("./model");
 const riwayatPendidikan = require("../riwayatPendidikan/model");
 const pengalamanKerja = require("../pengalamanKerja/model");
+const kebutuhanPelamar = require("../kebutuhanPelamar/model");
 const { v4: uuid_v4 } = require("uuid");
 const sq = require("../../config/connection");
 const { Sequelize } = require('sequelize');
@@ -110,6 +111,56 @@ class Controller {
     and pl."deletedAt" isnull`);
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
+
+  static updateFile(req,res){
+    const {kebutuhanPelamarId} = req.body;
+    let file1="";
+    kebutuhanPelamar.findAll({where:{id:kebutuhanPelamarId}}).then((data)=>{
+      if(data.length==0){
+        res.status(200).json({status:200,message:"data tidak ada"});
+      }else{
+        if(req.files){
+          if(req.files.file1[0]){
+            file1=req.files.file1[0].filename;
+          }
+        }
+        kebutuhanPelamar.update({statusKebutuhan:1,fileKebutuhan:file1},{where:{id:kebutuhanPelamarId}}).then((data2)=>{
+          res.status(200).json({status:200,message:"sukses"});
+        }).catch((err)=>{
+          console.log("update",err);
+          res.status(500).json({status:500,message:"gagal",data:err});
+        });
+      }
+    }).catch((err)=>{
+      console.log("find-all",err);
+      res.status(500).json({status:500,message:"gagal",data:err});
+    })
+  }
+  // static updateFile(req,res){
+  //   const {masterKebutuhanId,postLokerId} = req.body;
+  //   // let file1="";
+  //   kebutuhanPelamar.findAll({where:{masterKebutuhanId,postLokerId}}).then(async(data)=>{
+  //     if(data.length==0){
+  //       res.status(200).json({status:200,message:"data tidak ada"});
+  //     }else{
+  //       if(req.files){
+  //         if(req.files.file1){
+  //           // file1=req.files.file1[0].filename;
+  //           await sq.query(`update "kebutuhanPelamar" set "fileKebutuhan"='${req.files.file1[0].filename}' where "masterKebutuhanId" = '${masterKebutuhanId}' and "postLokerId"='${postLokerId}'`)
+  //         }
+  //       }
+  //       kebutuhanPelamar.update({statusKebutuhan:1},{where:{masterKebutuhanId,postLokerId}}).then((data2)=>{
+  //         res.status(200).json({status:200,message:"sukses"});
+  //       }).catch((err)=>{
+  //         console.log("update",err);
+  //         res.status(500).json({status:500,message:"gagal",data:err});
+  //       });
+  //     }
+  //   }).catch((err)=>{
+  //     console.log("find-all",err);
+  //     res.status(500).json({status:500,message:"gagal",data:err});
+  //   })
+  // }
 }
 
 module.exports = Controller;
