@@ -3,22 +3,24 @@ const sq = require('../../config/connection');
 const masterKebutuhan = require('../masterKebutuhan/model');
 const postLoker = require('../postLoker/model');
 
-const kebutuhanPelamar = sq.define('kebutuhanPelamar', {
-    id: {
+const kebutuhanPelamar = sq.define('kebutuhanPelamar',{
+    id:{
         type: DataTypes.STRING,
         primaryKey: true,
     },
-    statusKebutuhan: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0
+    statusKebutuhan:{
+        type:DataTypes.INTEGER,
+        defaultValue:0
+    },
+    fileKebutuhan:{
+        type:DataTypes.STRING
     }
-
 },
-    {
-        paranoid: true,
-        freezeTableName: true,
+{
+paranoid:true,
+freezeTableName:true,
+});
 
-    });
 kebutuhanPelamar.belongsTo(masterKebutuhan);
 masterKebutuhan.hasMany(kebutuhanPelamar)
 

@@ -15,68 +15,43 @@ class Controller {
   }
 
   static register(req, res) {
-    const {
-      nomorPO,
-      tanggalPO,
-      rencanaTglKedatangan,
-      masterSupplierId,
-      pembayaran,
-      TOP,
-      metodePengiriman,
-      totalHarga,
-      keterangan,
-      PPN,
-      bulkCC,
-      promo,
-      rev,
-      bulkBarang,
-    } = req.body;
+    const {nomorPO,tanggalPO,rencanaTglKedatangan,masterSupplierId,pembayaran,TOP,metodePengiriman,totalHarga,keterangan,PPN,bulkCC,promo,rev,bulkBarang,PRId} = req.body;
     const idPO = uuid_v4();
     PO.findAll({ where: { nomorPO } }).then((data) => {
       if (data.length) {
         res.status(200).json({ status: 200, message: "nomorPO sudah ada" });
       } else {
-        PO.create({
-          id: idPO,
-          nomorPO,
-          tanggalPO,
-          rencanaTglKedatangan,
-          masterSupplierId,
-          pembayaran,
-          TOP,
-          metodePengiriman,
-          totalHarga,
-          keterangan,
-          PPN,
-          promo,
-          rev,
-        }).then((data) => {
+        PO.create({id: idPO,nomorPO,tanggalPO,rencanaTglKedatangan,masterSupplierId,pembayaran,TOP,metodePengiriman,totalHarga,keterangan,PPN,promo,rev,PRId}).then((data1) => {
           for (let i = 0; i < bulkCC.length; i++) {
             const idCC = uuid_v4();
             bulkCC[i].POId = idPO;
             bulkCC[i].id = idCC;
           }
-          CC.bulkCreate(bulkCC).then((data) => {
+          CC.bulkCreate(bulkCC).then((data2) => {
             for (let i = 0; i < bulkBarang.length; i++) {
               const idSub = uuid_v4();
               bulkBarang[i].POId = idPO;
               bulkBarang[i].id = idSub;
             }
-            subPO.bulkCreate(bulkBarang).then((data) => {
+            subPO.bulkCreate(bulkBarang).then((data3) => {
               for (let i = 0; i < bulkBarang.length; i++) {
                 bulkBarang[i].id =
                   bulkBarang[i].masterBarangId + "-" + masterSupplierId;
                 bulkBarang[i].masterSupplierId = masterSupplierId;
               }
-              poolHargaSupplier
-                .bulkCreate(bulkBarang, { updateOnDuplicate: ["hargaBeli"] })
-                .then((data) => {
-                  res.status(200).json({ status: 200, message: "sukses" });
-                })
-                .catch((err) => {
-                  res
-                    .status(500)
-                    .json({ status: 500, message: "gagal", data: err });
+              poolHargaSupplier.bulkCreate(bulkBarang, { updateOnDuplicate: ["hargaBeli"] }).then((data4) => {
+                  if(PRId){
+                    PR.update({statusPR: 1},{where:{id:PRId}}).then((data5)=>{
+                      res.status(200).json({ status: 200, message: "sukses" });
+                    }).catch((err)=>{
+                      console.log("PR",err);
+                      res.status(500).json({ status: 500, message: "gagal", data: err });
+                    })
+                  }else{
+                    res.status(200).json({ status: 200, message: "sukses" });
+                  }
+                }).catch((err) => {
+                  res.status(500).json({ status: 500, message: "gagal", data: err });
                 });
             });
           });
@@ -175,38 +150,8 @@ class Controller {
   // }
 
   static update(req, res) {
-    const {
-      POId,
-      tanggalPO,
-      rencanaTglKedatangan,
-      masterSupplierId,
-      pembayaran,
-      TOP,
-      metodePengiriman,
-      totalHarga,
-      keterangan,
-      PPN,
-      promo,
-      rev,
-      bulkCC,
-      bulkBarang,
-    } = req.body;
-    PO.update(
-      {
-        tanggalPO,
-        rencanaTglKedatangan,
-        masterSupplierId,
-        pembayaran,
-        TOP,
-        metodePengiriman,
-        totalHarga,
-        keterangan,
-        PPN,
-        promo,
-        rev,
-      },
-      { where: { id: POId } }
-    ).then((data) => {
+    const {POId,tanggalPO,rencanaTglKedatangan,masterSupplierId,pembayaran,TOP,metodePengiriman,totalHarga,keterangan,PPN,promo,rev,bulkCC,bulkBarang,PRId} = req.body;
+    PO.update({tanggalPO,rencanaTglKedatangan,masterSupplierId,pembayaran,TOP,metodePengiriman,totalHarga,keterangan,PPN,promo,rev,PRId},{ where: { id: POId }}).then((data) => {
       subPO.destroy({ where: { POId: POId } }).then((data) => {
         for (let i = 0; i < bulkBarang.length; i++) {
           const idSub = uuid_v4();
@@ -276,8 +221,9 @@ class Controller {
     // let data =
     //   await sq.query(`select p.id as "idPO" ,p."nomorPO" ,p."tanggalPO" ,p.pembayaran ,p."TOP" ,p."metodePengiriman" ,p.keterangan ,p."PPN" ,p.promo ,p.rev , p."createdAt", p."updatedAt", p."deletedAt" ,p."masterSupplierId" ,p."totalHarga" ,p."rencanaTglKedatangan" ,ms.id, ms."namaSupplier", ms."deletedAt"
     //   from "PO" p join "masterSupplier" ms on p."masterSupplierId" = ms .id where p."deletedAt" isnull and ms."deletedAt" isnull `);
-    let data = await sq.query(`select distinct p.id as "idPO", p."nomorPO",p."tanggalPO" ,p.pembayaran ,p."TOP",p."metodePengiriman" ,p.keterangan ,p."PPN", p.promo, p."createdAt",p."updatedAt",p."deletedAt" ,p."masterSupplierId",p."PRId",p."totalHarga" ,p."rencanaTglKedatangan" ,ms.id,ms."namaSupplier" ,ms."deletedAt" ,sp."POId" ,sum(sp.jumlah) as "totalBarangPO", sp."deletedAt" from "subPO" sp join "PO" p on sp."POId" = p.id join "masterSupplier" ms on p."masterSupplierId" = ms.id where sp."deletedAt" isnull and ms."deletedAt" isnull and p."deletedAt" isnull group  by(ms.id,p.id, sp."POId",sp."deletedAt")`);
+    // let data = await sq.query(`select distinct p.id as "idPO", p."nomorPO",p."tanggalPO" ,p.pembayaran ,p."TOP",p."metodePengiriman" ,p.keterangan ,p."PPN", p.promo, p."createdAt",p."updatedAt",p."deletedAt" ,p."masterSupplierId",p."PRId",p."totalHarga" ,p."rencanaTglKedatangan" ,ms.id,ms."namaSupplier" ,ms."deletedAt" ,sp."POId" ,sum(sp.jumlah) as "totalBarangPO", sp."deletedAt",p2."nomorPR" from "subPO" sp join "PO" p on sp."POId" = p.id left join "PR" p2 on p2.id = p."PRId" join "masterSupplier" ms on p."masterSupplierId" = ms.id where sp."deletedAt" isnull and ms."deletedAt" isnull and p."deletedAt" isnull group  by(ms.id,p.id, sp."POId",sp."deletedAt",p2."nomorPR")`);
     // let data = await sq.query(`select distinct p.id as "idPO", p."nomorPO",p."tanggalPO" ,p.pembayaran ,p."TOP",p."metodePengiriman" ,p.keterangan ,p."PPN", p.promo, p."createdAt",p."updatedAt",p."deletedAt" ,p."masterSupplierId",p."PRId",p2."nomorPR",p."totalHarga" ,p."rencanaTglKedatangan" ,ms.id,ms."namaSupplier" ,ms."deletedAt" ,sp."POId" ,sum(sp.jumlah) as "totalBarangPO", sp."deletedAt" from "subPO" sp join "PO" p on sp."POId" = p.id join "masterSupplier" ms on p."masterSupplierId" = ms.id left join "PR" p2 on p2.id = p."PRId" where sp."deletedAt" isnull and ms."deletedAt" isnull and p."deletedAt" isnull and p2."deletedAt" isnull group  by ms.id,p.id, sp."POId",sp."deletedAt",p2."nomorPR"`);
+    let data = await sq.query(`select p.id as "idPO", p."nomorPO",p."tanggalPO",p."rencanaTglKedatangan",p.pembayaran,p."TOP",p."metodePengiriman",p."totalHarga",p.keterangan,p."PPN",p.promo,p.rev,p."masterSupplierId",ms."namaSupplier",p."PRId",p2."nomorPR",sum(sp.jumlah) as "totalBarangPO" from "subPO" sp join "PO" p on p.id = sp."POId" join "masterSupplier" ms on ms.id = p."masterSupplierId" left join "PR" p2 on p2.id = p."PRId" where sp."deletedAt" isnull and p."deletedAt" isnull and ms."deletedAt" isnull and p2."deletedAt" isnull group by p.id,sp."POId",ms."namaSupplier",p2."nomorPR" order by p."createdAt"`);
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
 

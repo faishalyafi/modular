@@ -1,9 +1,9 @@
-const postLoker = require("../model/postLokerModel");
-const kebutuhanLoker = require("../model/kebutuhanLokerModel");
-const kebutuhanPelamar = require("../model/kebutuhanPelamarModel");
-const kirimEmail = require("../helper/kirimEmail");
+const postLoker = require("../postLoker/model");
+const kebutuhanLoker = require("../kebutuhanLoker/model");
+const kebutuhanPelamar = require("../kebutuhanPelamar/model");
+const kirimEmail = require("../../helper/kirimEmail");
 const { v4: uuid_v4 } = require("uuid");
-const sq = require("../config/connection");
+const sq = require("../../config/connection");
 
 class Controller {
     static register(req, res) {
@@ -15,31 +15,32 @@ class Controller {
             }
         }
         kebutuhanLoker.findAll({
-            where: { lokerId }
+            where: {lokerId}
         })
-            .then((data) => {
-                postLoker
-                    .create({ id: uuid_v4(), namaPengirim, emailPengirim, alamatPengirim, statusPostLoker, lokerId, CV: fileCV })
-                    .then((data1) => {
-                        kirimEmail.kirim(data1.emailPengirim);
-                        let bulkKebutuhanPelamar = [];
-                        for (let i = 0; i < data.length; i++) {
-                            bulkKebutuhanPelamar.push({
-                                id: uuid_v4(),
-                                postLokerId: data1.id,
-                                masterKebutuhanId: data[i].masterKebutuhanId,
-                                statusKebutuhan: 0
-                            })
-                        }
-                        kebutuhanPelamar.bulkCreate(bulkKebutuhanPelamar)
-                            .then((data2) => {
-                                res.status(200).json({ status: 200, message: "sukses", });
-                            })
-                            .catch((err) => {
-                                res.status(500).json({ status: 500, message: "gagal", data: err });
-                            });
+        .then((data) => {
+            postLoker
+                .create({ id: uuid_v4(), namaPengirim, emailPengirim, alamatPengirim, statusPostLoker, lokerId, CV: fileCV })
+                .then((data1) => {
+                    kirimEmail.kirim(data1.emailPengirim);
+                    let bulkKebutuhanPelamar = [];
+                    for (let i = 0; i < data.length; i++) {
+                        bulkKebutuhanPelamar.push({
+                            id: uuid_v4(),
+                            postLokerId: data1.id,
+                            masterKebutuhanId: data[i].masterKebutuhanId,
+                            statusKebutuhan: 0
+                        })
+                    }
+                    
+                    kebutuhanPelamar.bulkCreate(bulkKebutuhanPelamar)
+                    .then((data2) => {
+                        res.status(200).json({ status: 200, message: "sukses", });
                     })
-            })
+                })
+                .catch((err) => {
+                    res.status(500).json({ status: 500, message: "gagal", data: err });
+                });
+        })
     }
 
     static async list(req, res) {
@@ -143,15 +144,14 @@ class Controller {
 
     static delete(req, res) {
         const { id } = req.body;
-        postLoker.destroy({ where: { id } }).then((data) => {
-            kebutuhanPelamar.destroy({ where: { postLokerId: id } })
-                .then((data2) => {
-                    res.status(200).json({ status: 200, message: "sukses" });
-                })
-                .catch((err) => {
-                    res.status(500).json({ status: 500, message: "gagal", data: err });
-                });
+        postLoker.destroy({ where: { id: id } }).then((data) => {
+            kebutuhanPelamar.destroy({ where: { postLokerId: id } }).then((data2) => {
+                res.status(200).json({ status: 200, message: "sukses" });
+            })
         })
+            .catch((err) => {
+                res.status(500).json({ status: 500, message: "gagal", data: err });
+            });
     }
 
     static async jumlahPelamarByLoker(req, res) {

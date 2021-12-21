@@ -51,9 +51,12 @@ const kelengkapanLamaran = sq.define('kelengkapanLamaran', {
     },
     tanggalMasukLamaran: {
         type: DataTypes.DATE
+<<<<<<< HEAD
     },
     statusKelengkapan: {
         type: DataTypes.INTEGER
+=======
+>>>>>>> f4ff7feffa55bd8d80fba3ba30ab5392dbeff11f
     }
 },
     {

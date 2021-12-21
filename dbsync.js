@@ -1,6 +1,4 @@
-
-
-const koneksi = require('./config/connection')
+const koneksi = require('./config/connection');
 
 
 let normalizedPath = require("path").join(__dirname, "./model");
