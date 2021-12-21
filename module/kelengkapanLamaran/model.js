@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
-const sq = require('../../config/connection');
-const postLoker = require('../postLoker/model');
+const sq = require('../config/connection');
+const postLoker = require('./postLokerModel');
 
 const kelengkapanLamaran = sq.define('kelengkapanLamaran', {
     id: {
@@ -52,36 +52,9 @@ const kelengkapanLamaran = sq.define('kelengkapanLamaran', {
     tanggalMasukLamaran: {
         type: DataTypes.DATE
     },
-    daftarRiwayatHidup: {
-        type: DataTypes.STRING
-    },
-    pasFoto4x6: {
-        type: DataTypes.INTEGER
-    },
-    pasFoto3x4: {
-        type: DataTypes.INTEGER
-    },
-    fotoCopyKTP: {
-        type: DataTypes.INTEGER
-    },
-    fotoCopyKK: {
-        type: DataTypes.INTEGER
-    },
-    fotoCopyIjazah: {
-        type: DataTypes.INTEGER
-    },
-    fotoCopySuratSehat: {
-        type: DataTypes.INTEGER
-    },
-    fotoCopySKCK: {
-        type: DataTypes.INTEGER
-    },
-    kartuJKK: {
-        type: DataTypes.INTEGER
-    },
     statusKelengkapan: {
-        type: DataTypes.INTEGER, // 0.default,1.verifikasi,2.ditolak,3.lengkap
-    }                  
+        type: DataTypes.INTEGER
+    }
 },
     {
         paranoid: true,

@@ -56,116 +56,59 @@ class Controller {
 
     static async listByStatus(req, res) {
         let { statusPostLoker } = req.params;
-        let kolomKelengkapan = "";
-        let joinTable = "";
-        if (statusPostLoker == 0) {
-            kolomKelengkapan = "";
-            joinTable = "";
-        } else if (statusPostLoker == 1) {
-            kolomKelengkapan = `,kl.id as "kelengkapanLamaranId",kl."namaPelamar" ,kl."nomorKTPPelamar" ,kl."posisiLamaran" ,kl."tinggiBadanPelamar" ,kl."beratBadanPelamar" ,kl."agamaPelamar" ,kl."kebangsaanPelamar" ,kl."jenisKelaminPelamar" ,kl."statusPelamar" ,kl."tempatLahirPelamar" ,kl."tanggalLahirPelamar" ,kl."noHpPelamar" ,kl."emailPelamar" ,kl."alamatPelamar" ,kl."tanggalMasukLamaran" ,kl."daftarRiwayatHidup" ,kl."pasFoto4x6" ,kl."pasFoto3x4" ,kl."fotoCopyKTP" ,kl."fotoCopyKK" ,kl."fotoCopyIjazah" ,kl."fotoCopySuratSehat" ,kl."fotoCopySKCK" ,kl."kartuJKK" ,kl."statusKelengkapan" ,kl."createdAt" ,kl."updatedAt" ,kl."deletedAt" `;
-            joinTable = `left join "kelengkapanLamaran" kl on kl."postLokerId" = pl.id  `;
-        }
-        let hasil = [];
         let data = await sq.query(`
-        select pl.id as "postLokerId",pl."namaPengirim" ,pl."emailPengirim" ,pl."alamatPengirim" ,pl."statusPostLoker" ,pl."lokerId" ,l."namaLoker" ,l."masterPosisiId" ,mp."namaPosisi" ,pl."CV", pl."createdAt" ,pl."updatedAt" ,pl."deletedAt" ${kolomKelengkapan}
-        from "postLoker" pl ${joinTable}
-        join loker l on l.id = pl."lokerId" 
-        join "masterPosisi" mp on mp.id = l."masterPosisiId" 
-        where pl."deletedAt" isnull 
-        and l."deletedAt" isnull 
-        and mp."deletedAt" isnull 
-        and pl."statusPostLoker" = ${statusPostLoker}`);
-        let dataPL = data[0];
-
-        for (let i = 0; i < dataPL.length; i++) {
-            let dataPl = {
-                postLokerId: dataPL[i].postLokerId,
-                namaPengirim: dataPL[i].namaPengirim,
-                emailPengirim: dataPL[i].emailPengirim,
-                alamatPengirim: dataPL[i].alamatPengirim,
-                statusPostLoker: dataPL[i].statusPostLoker,
-                lokerId: dataPL[i].lokerId,
-                namaLoker: dataPL[i].namaLoker,
-                masterPosisiId: dataPL[i].masterPosisiId,
-                namaPosisi: dataPL[i].namaPosisi,
-                CV: dataPL[i].CV,
-                createdAt: dataPL[i].createdAt,
-                updatedAt: dataPL[i].updatedAt,
-                deletedAt: dataPL[i].deletedAt,
-                kelengkapanLamaranId: dataPL[i].kelengkapanLamaranId,
-                namaPelamar: dataPL[i].namaPelamar,
-                nomorKTPPelamar: dataPL[i].nomorKTPPelamar,
-                posisiLamaran: dataPL[i].posisiLamaran,
-                tinggiBadanPelamar: dataPL[i].tinggiBadanPelamar,
-                beratBadanPelamar: dataPL[i].beratBadanPelamar,
-                agamaPelamar: dataPL[i].agamaPelamar,
-                kebangsaanPelamar: dataPL[i].kebangsaanPelamar,
-                jenisKelaminPelamar: dataPL[i].jenisKelaminPelamar,
-                statusPelamar: dataPL[i].statusPelamar,
-                tempatLahirPelamar: dataPL[i].tempatLahirPelamar,
-                tanggalLahirPelamar: dataPL[i].tanggalLahirPelamar,
-                noHpPelamar: dataPL[i].noHpPelamar,
-                emailPelamar: dataPL[i].emailPelamar,
-                alamatPelamar: dataPL[i].alamatPelamar,
-                tanggalMasukLamaran: dataPL[i].tanggalMasukLamaran,
-                daftarRiwayatHidup: dataPL[i].daftarRiwayatHidup,
-                pasFoto4x6: dataPL[i].pasFoto4x6,
-                pasFoto3x4: dataPL[i].pasFoto3x4,
-                fotoCopyKTP: dataPL[i].fotoCopyKTP,
-                fotoCopyKK: dataPL[i].fotoCopyKK,
-                fotoCopyIjazah: dataPL[i].fotoCopyIjazah,
-                fotoCopySuratSehat: dataPL[i].fotoCopySuratSehat,
-                fotoCopySKCK: dataPL[i].fotoCopySKCK,
-                kartuJKK: dataPL[i].kartuJKK,
-                statusKelengkapan: dataPL[i].statusKelengkapan,
-            }
-            hasil.push(dataPl);
-        }
-
-        res.status(200).json({ status: 200, message: "sukses", data: hasil });
+            select distinct pl.id as "postLokerId", pl."namaPengirim" ,pl."emailPengirim" ,pl."alamatPengirim" ,pl."statusPostLoker" ,pl."CV" ,pl."lokerId" ,l."namaLoker" ,l."keteranganLoker" ,l."tanggalAkhirLoker" ,l."masterPosisiId" ,mp."namaPosisi" ,mp."kodePosisi" ,kl.id as "kelengkapanLamaranId",kl."statusKelengkapan" 
+            from "postLoker" pl 
+            join loker l on l.id = pl."lokerId" 
+            join "masterPosisi" mp on mp.id = l."masterPosisiId" 
+            left join "kelengkapanLamaran" kl on kl."postLokerId" = pl.id 
+            where "statusPostLoker" = ${statusPostLoker}
+            and pl."deletedAt" isnull 
+            and l."deletedAt" isnull 
+            and mp."deletedAt" isnull 
+            and kl."deletedAt" isnull  `);
+        res.status(200).json({ status: 200, message: "sukses", data: data[0] });
     }
 
     static async detailListByStatus(req, res) {
-        let { statusPostLoker, postLokerId } = req.params;
-        let kolomKelengkapan = "";
-        let joinTable = "";
-        if (statusPostLoker == 0) {
-            kolomKelengkapan = "";
-            joinTable = "";
-        } else if (statusPostLoker == 1) {
-            kolomKelengkapan = `,kl.id as "kelengkapanLamaranId",kl."namaPelamar" ,kl."nomorKTPPelamar" ,kl."posisiLamaran" ,kl."tinggiBadanPelamar" ,kl."beratBadanPelamar" ,kl."agamaPelamar" ,kl."kebangsaanPelamar" ,kl."jenisKelaminPelamar" ,kl."statusPelamar" ,kl."tempatLahirPelamar" ,kl."tanggalLahirPelamar" ,kl."noHpPelamar" ,kl."emailPelamar" ,kl."alamatPelamar" ,kl."tanggalMasukLamaran" ,kl."daftarRiwayatHidup" ,kl."pasFoto4x6" ,kl."pasFoto3x4" ,kl."fotoCopyKTP" ,kl."fotoCopyKK" ,kl."fotoCopyIjazah" ,kl."fotoCopySuratSehat" ,kl."fotoCopySKCK" ,kl."kartuJKK" ,kl."statusKelengkapan" ,kl."createdAt" ,kl."updatedAt" ,kl."deletedAt" `;
-            joinTable = `left join "kelengkapanLamaran" kl on kl."postLokerId" = pl.id  `;
-        }
-
+        let { postLokerId } = req.params;
         let data = await sq.query(`
-        select pl.id as "postLokerId",pl."namaPengirim" ,pl."emailPengirim" ,pl."alamatPengirim" ,pl."statusPostLoker" ,pl."lokerId" ,l."namaLoker" ,l."masterPosisiId" ,mp."namaPosisi" ,pl."CV", pl."createdAt" ,pl."updatedAt" ,pl."deletedAt" ${kolomKelengkapan}
-        from "postLoker" pl ${joinTable}
-        join loker l on l.id = pl."lokerId" 
-        join "masterPosisi" mp on mp.id = l."masterPosisiId" 
-        where pl."deletedAt" isnull 
-        and l."deletedAt" isnull 
-        and mp."deletedAt" isnull 
-        and pl."statusPostLoker" = ${statusPostLoker} 
-        and pl.id = '${postLokerId}'`);
+        select distinct pl.id as "postLokerId", pl."namaPengirim" ,pl."emailPengirim" ,pl."alamatPengirim" ,pl."statusPostLoker" ,pl."CV" ,pl."lokerId" ,l."namaLoker" ,l."keteranganLoker" ,l."tanggalAkhirLoker" ,l."masterPosisiId" ,mp."namaPosisi" ,mp."kodePosisi" ,kl.id as "kelengkapanLamaranId",kl."statusKelengkapan",kl."namaPelamar" ,kl."nomorKTPPelamar" ,kl."posisiLamaran" ,kl."tinggiBadanPelamar" ,kl."beratBadanPelamar" ,kl."agamaPelamar" ,kl."kebangsaanPelamar" ,kl."jenisKelaminPelamar" ,kl."statusPelamar" ,kl."tempatLahirPelamar" ,kl."tanggalLahirPelamar" ,kl."noHpPelamar" ,kl."emailPelamar" ,kl."alamatPelamar" ,kl."tanggalMasukLamaran" 
+            from "postLoker" pl 
+            join loker l on l.id = pl."lokerId" 
+            join "masterPosisi" mp on mp.id = l."masterPosisiId" 
+            left join "kelengkapanLamaran" kl on kl."postLokerId" = pl.id 
+            where pl."deletedAt" isnull 
+            and l."deletedAt" isnull 
+            and mp."deletedAt" isnull 
+            and kl."deletedAt" isnull 
+            and pl.id = '${postLokerId}' `);
 
-        let dataPL = data[0][0];
-
-        let data2 = await sq.query(`
+        let rP = await sq.query(`
         select * 
         from "riwayatPendidikan" rp 
         where rp."kelengkapanLamaranId" = '${data[0][0].kelengkapanLamaranId}' 
         and rp."deletedAt" isnull `);
 
-        let data3 = await sq.query(`
+        let pK = await sq.query(`
         select * 
         from "pengalamanKerja" pk 
         where pk."kelengkapanLamaranId" = '${data[0][0].kelengkapanLamaranId}' 
         and pk."deletedAt" isnull `);
 
-        dataPL.riwayatPendidikan = data2[0];
-        dataPL.pengalamanKerja = data3[0];
+        let kP = await sq.query(`
+        select kp.id as "kebutuhanPelamarId", kp."masterKebutuhanId" ,kp."fileKebutuhan" ,mk."namaKebutuhan" ,kp."statusKebutuhan" ,kp."postLokerId" 
+        from "kebutuhanPelamar" kp 
+        join "masterKebutuhan" mk on mk.id = kp."masterKebutuhanId" 
+        where kp."deletedAt" isnull 
+        and mk."deletedAt" isnull 
+        and kp."postLokerId" = '${postLokerId}'`);
 
-        res.status(200).json({ status: 200, message: "sukses", data: dataPL });
+        data[0][0].riwayatPendidikan = rP[0];
+        data[0][0].pengalamanKerja = pK[0];
+        data[0][0].kebutuhanPelamar = kP[0];
+
+        res.status(200).json({ status: 200, message: "sukses", data: data[0] });
     }
 
     static detailsById(req, res) {
@@ -222,17 +165,19 @@ class Controller {
         res.status(200).json({ status: 200, message: "sukses", data: data[0] });
     }
 
-    static async listKebutuhanByPostLokerId(req, res) {
+    static async listKebutuhanByLokerId(req, res) {
         const { postLokerId } = req.params;
         let data = await sq.query(`
-            select kp."masterKebutuhanId" ,mk."namaKebutuhan" ,mk."createdAt" ,mk."updatedAt" ,mk."deletedAt" 
-            from "postLoker" pl 
-            join "kebutuhanPelamar" kp on kp."postLokerId" = pl.id 
+            select kp.id as "kebutuhanPelamarId", kp."masterKebutuhanId" ,mk."namaKebutuhan" 
+            from "kebutuhanPelamar" kp 
             join "masterKebutuhan" mk on mk.id = kp."masterKebutuhanId" 
-            where kp."postLokerId" = '${postLokerId}' 
-            and pl."deletedAt" isnull 
+            join "postLoker" pl on pl.id = kp."postLokerId" 
+            join loker l on l.id = pl."lokerId" 
+            where kp."postLokerId" = '${postLokerId}'
             and kp."deletedAt" isnull 
-            and mk."deletedAt" isnull `);
+            and mk."deletedAt" isnull 
+            and pl."deletedAt" isnull 
+            and l."deletedAt" isnull  `);
         res.status(200).json({ status: 200, message: "sukses", data: data[0] });
     }
 }
