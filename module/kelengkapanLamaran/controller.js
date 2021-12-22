@@ -6,6 +6,7 @@ const { v4: uuid_v4 } = require("uuid");
 const sq = require("../../config/connection");
 const { Sequelize } = require('sequelize');
 const Op = Sequelize.Op;
+
 class Controller {
   static register(req, res) {
     const { namaPelamar, nomorKTPPelamar, posisiLamaran, tinggiBadanPelamar, beratBadanPelamar, agamaPelamar, kebangsaanPelamar, jenisKelaminPelamar, statusPelamar, tempatLahirPelamar, tanggalLahirPelamar, noHpPelamar, emailPelamar, alamatPelamar, tanggalMasukLamaran,postLokerId, statusKelengkapan, bulkPengalamanKerja, bulkRiwayatPendidikan } = req.body;

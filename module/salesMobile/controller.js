@@ -4,7 +4,6 @@ const sq = require('../../config/connection')
 const { v4: uuid_v4 } = require("uuid");
 const moment= require('moment')
 
-
 class Controller{
 
     static async jumlahTokoBySalesLogin(req,res){
@@ -123,19 +122,29 @@ class Controller{
     }
 
     static async listCustomerBySalesMobile(req,res){
-        const{halaman}=req.params
-        let offset= +halaman * 10
-        let offset2 = (+halaman + 1)*10
-        let sisa = true
+        let {halaman}=req.params
+        let data =""
+        let data2=""
+        let sisa =false
 
-        let data = await sq.query(`select * from "masterCustomer" mc where mc."masterUserId" ='${req.dataUsers.id}' and mc."deletedAt" isnull order by id limit 10 offset ${offset}`)
+        if(halaman=="all"){
+            data = await sq.query(`select * from "masterCustomer" mc where mc."masterUserId" ='${req.dataUsers.id}' and mc."deletedAt" isnull order by id`)
+        }
+        else{
+            let offset= +halaman * 10
+            let offset2 = (+halaman + 1)*10
+            
 
-        let data2 = await sq.query(`select * from "masterCustomer" mc where mc."masterUserId" ='${req.dataUsers.id}' and mc."deletedAt" isnull order by id limit 10 offset ${offset2}`)
+            data = await sq.query(`select * from "masterCustomer" mc where mc."masterUserId" ='${req.dataUsers.id}' and mc."deletedAt" isnull order by id limit 10 offset ${offset}`)
 
-        if(data2[0].length==0){
-            sisa=false
+            data2 = await sq.query(`select * from "masterCustomer" mc where mc."masterUserId" ='${req.dataUsers.id}' and mc."deletedAt" isnull order by id limit 10 offset ${offset2}`)
+
+            if(data2[0].length > 0){
+                sisa=true
+            }
         }
         res.status(200).json({ status: 200, message: "sukses",data:data[0],sisa})
+
     }
 
     static async listCustomerBelumApprove(req,res){

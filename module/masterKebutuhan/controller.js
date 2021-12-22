@@ -21,8 +21,7 @@ class Controller {
 static list(req, res) {
   masterKebutuhan.findAll().then((data) => {
       res.status(200).json({status: 200,message: "sukses",data: data,});
-    })
-    .catch((err) => {
+    }).catch((err) => {
       res.status(500).json({status: 500,message: "gagal",data: err,});
     });
 }

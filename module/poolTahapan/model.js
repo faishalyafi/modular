@@ -19,7 +19,8 @@ const poolTahapan = sq.define('poolTahapan',{
         type:DataTypes.DATE
     },
     statusTahapan:{
-        type:DataTypes.STRING
+        type:DataTypes.STRING,
+        defaultValue:0
     }
 
 },

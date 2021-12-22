@@ -85,4 +85,5 @@ class Controller {
     res.status(200).json({status:200,message:"sukses",data:data[0]})
   }
 }
+
 module.exports = Controller;
