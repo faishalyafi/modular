@@ -13,5 +13,6 @@ router.post('/update', uploadPdf, Controller.update);
 router.post('/delete', Controller.delete);
 router.get('/jumlahPelamarByLoker', Controller.jumlahPelamarByLoker);
 router.get('/listKebutuhanByLokerId/:postLokerId', Controller.listKebutuhanByLokerId);
+router.get('/detailListByPostLokerId/:postLokerId', Controller.detailListByPostLokerId);
 
 module.exports = router

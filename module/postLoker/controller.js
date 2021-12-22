@@ -180,6 +180,13 @@ class Controller {
             and l."deletedAt" isnull  `);
         res.status(200).json({ status: 200, message: "sukses", data: data[0] });
     }
+    static async detailListByPostLokerId(req, res) {
+        const { postLokerId } = req.params;
+        let data = await sq.query(`select "namaPelamar" ,"alamatPelamar", "emailPelamar", "noHpPelamar" ,"posisiLamaran" from "kelengkapanLamaran" kl where kl."deletedAt" isnull and "postLokerId" ='${postLokerId}' `);
+        let data2 = await sq.query(`select pt.id as "poolTahapanId",* from "poolTahapan" pt join "masterTahapan" mt on pt."masterTahapanId" =mt.id where "postLokerId" ='${postLokerId}' and pt."deletedAt"  isnull and mt ."deletedAt" isnull`);
+        data[0][0].tahapan=data2[0]
+        res.status(200).json({ status: 200, message: "sukses", data: data[0]});
+    }
 }
 
 module.exports = Controller;
