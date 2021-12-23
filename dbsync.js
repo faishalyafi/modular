@@ -1,12 +1,23 @@
 const koneksi = require('./config/connection');
 
+let normalizedPath = require("path").join(__dirname, "./module");
 
-let normalizedPath = require("path").join(__dirname, "./model");
 require("fs").readdirSync(normalizedPath).forEach(function(file) {
-
-require("./model/" + file);
-
+    let normalize = require("path").join(__dirname, "./module/"+file);
+    require("fs").readdirSync(normalize).forEach(function(file2) {
+        if(file2=="model.js"){
+            require(`./module/${file}/model.js`)
+        }
+    });
 });
+
+
+// let normalizedPath = require("path").join(__dirname, "./model");
+// require("fs").readdirSync(normalizedPath).forEach(function(file) {
+
+// require("./model/" + file);
+
+// });
 
 
 koneksi.sync({ alter: true }).then(() => {

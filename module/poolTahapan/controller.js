@@ -50,7 +50,7 @@ class Controller {
     const { id, nilaiPoolTahapan,keteranganPoolTahapan,tanggalPemanggilan,statusTahapan,masterTahapanId,postLokerId } = req.body;
     poolTahapan.update({ nilaiPoolTahapan,keteranganPoolTahapan,tanggalPemanggilan,statusTahapan,masterTahapanId,postLokerId }, { where: { id }, returning: true }).then((data) => {
       if(req.body.statusTahapan == 2){
-        postLoker.update({statusPostLoker : 2}, { where: { id:postLokerId }, returning: true }).then((data1) => {
+        postLoker.update({statusPostLoker : 3}, { where: { id:postLokerId }, returning: true }).then((data1) => {
           res.status(200).json({ status: 200, message: "sukses", data: data[1] })
         }).catch((err) => {
           console.log("if error");
