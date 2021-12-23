@@ -86,39 +86,17 @@ class Unit {
   static update(req, res) {
     const { id, satuan, jumlahIsi } = req.body;
     unit
-      .findAll({
-        where: {
-          id: id,
-        },
-      })
-      .then((data) => {
-        if (data.length) {
-          if (data[0].satuan == satuan) {
-            res.status(200).json({
-              status: 200,
-              message: "data sudah ada",
-            });
-          } else {
-            unit
-              .update(
-                {
-                  satuan: satuan,
-                  jumlahIsi: jumlahIsi,
-                },
-                {
-                  where: {
-                    id: id,
-                  },
-                }
-              )
-              .then((data2) => {
-                res.status(200).json({
-                  status: 200,
-                  message: "sukses",
-                });
-              });
-          }
+      .update(
+        {satuan, jumlahIsi},
+        {
+          where: {id}
         }
+      )
+      .then((data2) => {
+        res.status(200).json({
+          status: 200,
+          message: "sukses",
+        });
       })
       .catch((err) => {
         res.status(500).json({
