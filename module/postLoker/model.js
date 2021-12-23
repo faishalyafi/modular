@@ -20,7 +20,7 @@ const postLoker = sq.define('postLoker', {
         type: DataTypes.STRING
     },
     statusPostLoker: {
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER  // 0: dibuat || 1: Acc || 2: Lengkap Lanjut || 3: Lengkap di Tolak
     }
 },
     {
