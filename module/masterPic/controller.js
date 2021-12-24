@@ -68,24 +68,15 @@ class Pic {
 
   static async listByMasterSupplierId(req, res) {
     const { masterSupplierId } = req.params;
-    console.log(req.params);
-    let data = await sq.query(`
-      select mp.id as "masterPicId" , * from "masterPic" mp 
-      join "masterSupplier" ms ON mp."masterSupplierId" = ms.id 
-      where mp."deletedAt" isnull 
-      and ms."deletedAt" isnull 
-      and ms.id = '${masterSupplierId}' `);
+    // console.log(req.params);
+    let data = await sq.query(`select mp.id as "masterPicId",mp."nomorIdentitas",mp."jenisIdentitas",mp.nama,mp."nomorTelepon",mp.jabatan,mp.email,mp."masterCustomerId",mp."masterSupplierId",ms."namaSupplier" from "masterPic" mp join "masterSupplier" ms ON mp."masterSupplierId" = ms.id where mp."deletedAt" isnull and ms."deletedAt" isnull and ms.id = '${masterSupplierId}' `);
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
 
   static async listByMasterCustomerId(req, res) {
     const { masterCustomerId } = req.params;
-    let data = await sq.query(`
-			select mp.* from "masterPic" mp 
-			join "masterCustomer" mc on mp."masterCustomerId" =mc.id 
-			where mp."deletedAt" isnull 
-			and mc."deletedAt" isnull 
-			and mc.id ='${masterCustomerId}';`);
+    // let data = await sq.query(`select mp.* from "masterPic" mp join "masterCustomer" mc on mp."masterCustomerId" =mc.id where mp."deletedAt" isnull and mc."deletedAt" isnull and mc.id ='${masterCustomerId}';`);
+    let data =  await sq.query(`select mp.id as "masterPicId",mp."nomorIdentitas",mp."jenisIdentitas",mp.nama,mp."nomorTelepon",mp.jabatan,mp.email,mp."masterSupplierId",mp."masterCustomerId",mc."namaCustomer" from "masterPic" mp join "masterCustomer" mc on mc.id = mp."masterCustomerId" where mp."deletedAt" isnull and mc."deletedAt" isnull and mc.id = '${masterCustomerId}'`);
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
 
