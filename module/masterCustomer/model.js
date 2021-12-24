@@ -20,7 +20,7 @@ const masterCustomer = sq.define( 'masterCustomer', {
 		type: DataTypes.TEXT
 	},
 	kodePos: {
-		type: DataTypes.DOUBLE
+		type: DataTypes.STRING
 	},
 	nomorTelepon: {
 		type: DataTypes.STRING
