@@ -25,10 +25,10 @@ const supplier = sq.define(
       type: DataTypes.STRING,
     },
     longitude: {
-      type: DataTypes.DOUBLE,
+      type: DataTypes.STRING,
     },
     latitude: {
-      type: DataTypes.DOUBLE,
+      type: DataTypes.STRING,
     },
   },
   {

@@ -41,7 +41,7 @@ const kelengkapanLamaran = sq.define('kelengkapanLamaran', {
         type: DataTypes.DATE
     },
     noHpPelamar: {
-        type: DataTypes.INTEGER
+        type: DataTypes.STRING
     },
     emailPelamar: {
         type: DataTypes.STRING
