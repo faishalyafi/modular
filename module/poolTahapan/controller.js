@@ -6,28 +6,15 @@ const sq = require("../../config/connection");
 class Controller {
   
   static register(req,res){
-    const { nilaiPoolTahapan,keteranganPoolTahapan,tanggalPemanggilan,masterTahapanId,postLokerId} = req.body;
+    const { nilaiPoolTahapan,keteranganPoolTahapan,tanggalPemanggilan,masterTahapanId,postLokerId,jamPemanggilan} = req.body;
 
-    poolTahapan.create({ id: uuid_v4(), nilaiPoolTahapan,keteranganPoolTahapan,tanggalPemanggilan,masterTahapanId,postLokerId }).then((data1) => {
+    poolTahapan.create({ id: uuid_v4(), nilaiPoolTahapan,keteranganPoolTahapan,tanggalPemanggilan,masterTahapanId,postLokerId,jamPemanggilan}).then((data1) => {
       res.status(200).json({ status: 200, message: "sukses" });
     }).catch((err)=>{
       res.status(500).json({ status: 500, message: "gagal", data: err });
     })
   }
-  // static register(req, res) {
-  //   const { nilaiPoolTahapan,keteranganPoolTahapan,tanggalPemanggilan,masterTahapanId,postLokerId} = req.body;
-  //   poolTahapan.findAll({ where: { postLokerId: postLokerId } }).then((data) => {
-  //     if (data.length) {
-  //       res.status(200).json({ status: 200, message: "data sudah ada" });
-  //     } else {
-  //       poolTahapan.create({ id: uuid_v4(), nilaiPoolTahapan,keteranganPoolTahapan,tanggalPemanggilan,masterTahapanId,postLokerId }).then((data1) => {
-  //         res.status(200).json({ status: 200, message: "sukses" });
-  //       });
-  //     }
-  //   }).catch((err) => {
-  //     res.status(500).json({ status: 500, message: "gagal", data: err });
-  //   });
-  // }
+
   static list(req, res) {
       poolTahapan.findAll().then((data) => {
           res.status(200).json({status: 200,message: "sukses",data: data});
@@ -35,7 +22,6 @@ class Controller {
           res.status(500).json({status: 500, message: "gagal",data: err});
         });
     }
-
 
   static detailsById(req, res) {
     const { id } = req.params;
@@ -47,9 +33,10 @@ class Controller {
   }
 
   static update(req, res) {
-    const { id, nilaiPoolTahapan,keteranganPoolTahapan,tanggalPemanggilan,statusTahapan,masterTahapanId,postLokerId } = req.body;
-    poolTahapan.update({ nilaiPoolTahapan,keteranganPoolTahapan,tanggalPemanggilan,statusTahapan,masterTahapanId,postLokerId }, { where: { id }, returning: true }).then((data) => {
+    const { id, nilaiPoolTahapan,keteranganPoolTahapan,tanggalPemanggilan,statusTahapan,masterTahapanId,postLokerId,jamPemanggilan} = req.body;
+    poolTahapan.update({ nilaiPoolTahapan,keteranganPoolTahapan,tanggalPemanggilan,statusTahapan,masterTahapanId,postLokerId,jamPemanggilan}, { where: { id }, returning: true }).then((data) => {
       if(req.body.statusTahapan == 2){
+        // status:3 => gagal 
         postLoker.update({statusPostLoker : 3}, { where: { id:postLokerId }, returning: true }).then((data1) => {
           res.status(200).json({ status: 200, message: "sukses", data: data[1] })
         }).catch((err) => {
@@ -76,7 +63,7 @@ class Controller {
   static async listTahapanByPostLokerId(req,res){
     const {postLokerId}= req.params
 
-    let data = await sq.query(`select pt.id as "poolTahapanId",pt."nilaiPoolTahapan",pt."keteranganPoolTahapan",pt."tanggalPemanggilan",pt."statusTahapan",pt."masterTahapanId",mt."namaTahapan",pt."postLokerId",pl."namaPengirim",pl."emailPengirim",pl."statusPostLoker" from "poolTahapan" pt join "masterTahapan" mt on mt.id = pt."masterTahapanId" join "postLoker" pl on pl.id = pt."postLokerId" where pt."deletedAt" isnull and mt."deletedAt" isnull and pl."deletedAt" isnull  and pt."postLokerId" = '${postLokerId}' order by pt."createdAt" `)
+    let data = await sq.query(`select pt.id as "poolTahapanId",pt."nilaiPoolTahapan",pt."keteranganPoolTahapan",pt."tanggalPemanggilan",pt."jamPemanggilan",pt."statusTahapan",pt."masterTahapanId",mt."namaTahapan",pt."postLokerId",pl."namaPengirim",pl."emailPengirim",pl."statusPostLoker" from "poolTahapan" pt join "masterTahapan" mt on mt.id = pt."masterTahapanId" join "postLoker" pl on pl.id = pt."postLokerId" where pt."deletedAt" isnull and mt."deletedAt" isnull and pl."deletedAt" isnull  and pt."postLokerId" = '${postLokerId}' order by pt."createdAt" `)
     res.status(200).json({status:200,message:"sukses",data:data[0]});
   }
 

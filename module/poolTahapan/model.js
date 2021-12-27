@@ -18,6 +18,9 @@ const poolTahapan = sq.define('poolTahapan',{
     tanggalPemanggilan:{
         type:DataTypes.DATE
     },
+    jamPemanggilan:{
+        type: DataTypes.TIME
+    },
     statusTahapan:{
         type:DataTypes.STRING,
         defaultValue:0

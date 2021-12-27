@@ -126,7 +126,7 @@ class Controller {
           }
         }
         kebutuhanPelamar.update({statusKebutuhan:1,fileKebutuhan:file1},{where:{id:kebutuhanPelamarId}}).then((data2)=>{
-          res.status(200).json({status:200,message:"sukses"});
+          res.status(200).json({status:200,message:"sukses",data:file1});
         }).catch((err)=>{
           console.log("update",err);
           res.status(500).json({status:500,message:"gagal",data:err});
