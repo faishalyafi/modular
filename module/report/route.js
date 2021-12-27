@@ -7,5 +7,6 @@ router.get("/reportAllPenjualan", Controller.reportAllPenjualan);
 router.get("/reportSearchPenjualan", Controller.reportSearchPenjualan);
 router.get("/reportPO", Controller.reportPO);
 router.get("/reportSearchPO", Controller.reportSearchPO);
+router.get("/reportDataKaryawan/:masterDivisiId", Controller.reportDataKaryawan );
 
 module.exports = router;

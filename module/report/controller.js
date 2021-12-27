@@ -414,6 +414,81 @@ class Controller {
     await workbook.xlsx.write(res);
     res.end();
   }
+  static async reportDataKaryawan(req, res) {
+    const {masterDivisiId}=req.params
+    let x;
+    
+    console.log(masterDivisiId);
+
+    if(masterDivisiId == 0){
+      x=""
+    }else{
+      x=`and dk."masterDivisiId"='${masterDivisiId}'`
+    }
+    console.log(x);
+    let data = await sq.query(`select  dk."masterDivisiId" ,dk."namaKaryawan" ,mp."namaPosisi" ,mp."kodePosisi" ,md."namaDivisi" ,md."kodeDivisi" , dk."nomorKTPKaryawan" ,dk."tinggiBadanKaryawan" ,dk."beratBadanKaryawan" ,dk."agamaKaryawan" ,"kebangsaanKaryawan" ,dk."jenisKelaminKaryawan", dk."statusKaryawan" , dk."tanggalLahirKaryawan" ,dk."noHpKaryawan" ,dk."emailKaryawan" , dk."alamatKaryawan" ,dk."tanggalMulaiKerja",dk."statusKerjaKaryawan" ,dk."lamaKontrakKaryawan" ,dk."namaIstriKaryawan" ,dk."KTPIstriKaryawan" ,dk."alamatIstriKaryawan",dk."jumlahAnakKaryawan",dk."namaAnak1Karyawan" ,dk."namaAnak2Karyawan" ,dk."fotoProfilKaryawan" ,dk."fotoKKKaryawan" 
+    from "dataKaryawan" dk 
+    join "masterPosisi" mp on dk."masterPosisiId" =mp.id 
+    join "masterDivisi" md on dk."masterDivisiId" =md.id 
+    where dk."deletedAt"  isnull and mp."deletedAt" isnull and md."deletedAt" isnull ${x} `);
+
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet("Serova");
+
+    let c = [
+      { header: "Nama Karyawan", key: "namaKaryawan", width: 10 },
+      { header: "Nama Posisi", key: "namaPosisi", width: 10 },
+      { header: "Kode Posisi", key: "kodePosisi", width: 10 },
+      { header: "Nama Divisi", key: "namaDivisi", width: 10 },
+      { header: "kode Divisi", key: "kodeDivisi", width: 10 },
+      { header: "Nomor KTP Karyawan", key: "nomorKTPKaryawan", width: 10 },
+      { header: "Tinggi Badan Karyawan", key: "tinggiBadanKaryawan", width: 10 },
+      { header: "Berat Badan Karyawan", key: "beratBadanKaryawan", width: 10 },
+      { header: "Agama Karyawan", key: "agamaKaryawan", width: 10 },
+      { header: "Kebangsaan Karyawan", key: "kebangsaanKaryawan", width: 10 },
+      { header: "Jenis Kelaimin", key: "jenisKelaimin", width: 10 },
+      { header: "Status Karyawan", key: "statusKaryawan", width: 10 },
+      { header: "Tempat Lahir Karyawan", key: "tempatLahirKaryawan", width: 10 },
+      { header: "Tanggal Lahir Karyawan", key: "tanggalLahirKaryawan", width: 10 },
+      { header: "No HP Karyawan", key: "noHpKaryawan", width: 10 },
+      { header: "Email Karyawan", key: "emailKaryawan", width: 10 },
+      { header: "Alamat Karyawan", key: "alamatKaryawan", width: 10 },
+      { header: "Tanggal Mulai Kerja", key: "tanggalMulaiKerja", width: 10 },
+      { header: "Status Kerja Karyawan", key: "statusKerjaKaryawan", width: 10 },
+      { header: "Lama Kontrak Karyawan", key: "lamaKontrakKaryawan", width: 10 },
+      { header: "Nama Istri Karyawan", key: "namaIstriKaryawan", width: 10 },
+      { header: "KTP Istri Karyawan", key: "KTPIstriKaryawan", width: 10 },
+      { header: "Alamat Istri Karyawan", key: "alamatIstriKaryawan", width: 10 },
+      { header: "Jumlah Anak Karyawan", key: "jumlahAnakKaryawan", width: 10 },
+      { header: "Nama Anak 1 Karyawan", key: "namaAnak1Karyawan", width: 10 },
+      { header: "Nama Anak 2 Karyawan", key: "namaAnak2Karyawan", width: 10 },
+      { header: "Foto Profil Karyawan", key: "fotoProfilKaryawan", width: 10 },
+      { header: "Foto KK Karyawan", key: "fotoKKKaryawan", width: 10 },
+
+      
+    ];
+    // console.log(x);
+    sheet.columns = c;
+    let isi = data[0];
+
+    for (let i = 0; i < isi.length; i++) {
+      if(isi[i].statusKerjaKaryawan == 0){
+        isi[i].statusKerjaKaryawan="kontrak"
+      }else{
+        isi[i].statusKerjaKaryawan="permanen"
+      }
+      sheet.addRow(isi[i]);
+    }
+
+    let fileName = "dataKaryawan.xlsx";
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+    await workbook.xlsx.write(res);
+    res.end();
+  }
 }
 
 module.exports = Controller;
