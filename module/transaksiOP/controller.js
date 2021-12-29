@@ -281,6 +281,44 @@ class Controller {
       res.status(500).json({status:500,message:"gagal",data:err});
     });
   }
+  static async listTransaksiOPByNoOP(req, res) {
+    const {nomorOP}=req.params
+    let data = await sq.query(`select to2.id ,to2."namaPengirimOP" ,to2."nomorDO",to2."statusTransaksiOP" ,o."nomorOP",mb."namaBarang",mb."kodeBarang",sto."jumlahBarangOP" , s."batchNumber" ,s."jumlahStock",sto."hargaJualOP" ,sto."hargaTotalOP", sto."isBonus" from "subTransaksiOP" sto 
+    join "transaksiOP" to2 on sto."transaksiOPId" =to2.id
+    join stock s on sto."stockId" =s.id
+    join "masterBarang" mb on s."masterBarangId" =mb.id
+    join "OP" o on to2."OPId" =o.id 
+    where to2."deletedAt"  isnull  and o."deletedAt"  isnull and sto."deletedAt" isnull and s."deletedAt" isnull and mb."deletedAt" isnull
+    and o."nomorOP" ='${nomorOP}' and to2."pembatalanTransaksiOP" isnull
+     `)
+     let data2 = await sq.query(`select to2.id ,to2."namaPengirimOP"  ,to2 ."nomorDO" ,to2."statusTransaksiOP",o."nomorOP" from "transaksiOP" to2 
+     join "OP" o on to2."OPId" =o.id 
+     where to2."deletedAt" isnull  and o."deletedAt" isnull and o."nomorOP" ='${nomorOP}' and to2."pembatalanTransaksiOP" isnull
+     `)
+     let a=data[0]
+     let b=data2[0]
+     let hasil=[]
+
+     for (let i = 0; i < b.length; i++) {
+       b[i].barang=[]
+      
+       for (let j = 0; j < a.length; j++) {
+         if(b[i].id == a[j].id){
+           let x={}
+           x.namaBarang=a[j].namaBarang,
+           x.hargaJualOP=a[j].hargaJualOP,
+           x.hargaTotalOP=a[j].hargaTotalOP,
+           x.jumlahBarangOP=a[j].jumlahBarangOP,
+           x.isBonus=a[j].isBonus
+          b[i].barang.push(x)
+         }
+       }
+
+       hasil.push(b[i])
+     }
+
+    res.status(200).json({ status: 200, message: "sukses", data: hasil });
+  }
 }
 
 module.exports = Controller;

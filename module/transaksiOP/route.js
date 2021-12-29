@@ -11,6 +11,7 @@ router.get("/generateNoDO", authentification, Controller.generateNoDO);
 router.get("/listAllTransaksiOP", authentification, Controller.listAllTransaksiOP);
 router.get("/listTransaksiOPById/:id", authentification, Controller.listTransaksiOPById);
 router.get("/detailsOPByTransaksiId/:idTransaksi", authentification, Controller.detailsOPByTransaksiId);
+router.get("/listTransaksiOPByNoOP/:nomorOP", authentification, Controller.listTransaksiOPByNoOP);
 // router.post("/delete", authentification, Controller.delete);
 
 module.exports = router;
