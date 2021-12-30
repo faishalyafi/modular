@@ -32,7 +32,7 @@ const OP = sq.define(
       type: DataTypes.DOUBLE,
     },
     statusOP:{
-      type:DataTypes.INTEGER,
+      type:DataTypes.INTEGER,   //0: Baru dibuat || 1: di accept || 2: dikirim || 3: lengkap tanpa Bonus || 4: lengkap dengan Bonus
       defaultValue:0
     }
   },
@@ -46,5 +46,4 @@ custommer.hasMany(OP);
 
 OP.belongsTo(user);
 user.hasMany(OP);
-
 module.exports = OP;

@@ -7,6 +7,7 @@ router.post("/updateOP", authentification, Controller.updateOP);
 router.post("/updateSubOP", authentification, Controller.updateSubOP);
 router.get("/generateNoOP", authentification, Controller.generateNoOP);
 router.post("/listBarangOPByNoOP/", authentification, Controller.listBarangOPByNoOP); //nomorOP && kategoriHargaId
+router.post("/listBarangTransaksiOPByNoOP/", authentification, Controller.listBarangTransaksiOPByNoOP); //nomorOP 
 router.get("/list", authentification, Controller.list);
 router.post("/listOPBySales", authentification, Controller.listOPBySales);
 router.get("/listAllLaporanOP", authentification, Controller.listAllLaporanOP);
@@ -19,7 +20,7 @@ router.get("/listAllPenjualanHariIni", authentification, Controller.listAllPenju
 router.get("/listAllPenjualanSatuBulan", authentification, Controller.listAllPenjualanSatuBulan);
 router.post("/acceptedOP/", authentification, Controller.acceptedOP); //nomorOP
 router.get('/grafikPenjualanPertahun/:tahun',authentification,Controller.grafikPenjualanPertahun)
-// router.post("/delete", authentification, Controller.delete);
+router.post("/delete", authentification, Controller.delete);
 // router.get("/listBarangOPByNoOP/:nomorOP", authentification, Controller.listBarangOPByNoOP); //nomorOP
 
 module.exports = router;

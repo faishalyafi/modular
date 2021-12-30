@@ -9,21 +9,18 @@ const sq = require("../../config/connection");
 class Controller {
   static async register(req, res) {
     //! stock = jumlah Barang subTransaksi
-    const { POId, noInvoice, tglKedatangan, keterangan, bulkBarang, gudangId } = req.body;
+    const { POId, noInvoice, tglKedatangan, keterangan, bulkBarang, gudangId,statusPO } = req.body;
+    
     let barangM = `mb.id='${bulkBarang[0].masterBarangId}'`;
     let batch = `s."batchNumber"= '${bulkBarang[0].batchNumber}'`;
     for (let i = 1; i < bulkBarang.length; i++) {
       batch += ` or s."batchNumber"= '${bulkBarang[i].batchNumber}'`;
       barangM += ` or mb.id='${bulkBarang[i].masterBarangId}'`;
     }
-    // console.log(barangM);
-    // console.log(batch);
+
     let cekKode = await sq.query(`select * from stock s where s."deletedAt" isnull and (${batch})`);
     let barang = await sq.query(`select * from "masterBarang" mb where mb ."deletedAt" isnull and (${barangM})`);
-    // console.log(barang[0]);
-    // console.log("===============================");
-    // console.log(cekKode[0]);
-    // console.log("===============================");    
+   
     if (cekKode[0].length) {
       res.status(200).json({ status: 200, message: "batch sudah ada" });
     } else {
@@ -52,12 +49,14 @@ class Controller {
                 }
               }
               masterBarang.bulkCreate(barang[0], {updateOnDuplicate: ["jumlahTotalBarang"]}).then((data4) => {
+                PO.update({statusPO},{where:{id:POId}}).then((data5)=>{
                   res.status(200).json({ status: 200, message: "sukses" });
-                }).catch((err)=>{
-                  res.status(500).json({ status: 500, message: "gagal",data:err });
                 });
               });
+            });
           });
+        }).catch((err)=>{
+          res.status(500).json({ status: 500, message: "gagal",data:err });
         });
     }
   }
@@ -208,6 +207,8 @@ class Controller {
     // res.status(200).json({ status: 200, message: "sukses", data: hasil });
   }
 
+  
+
   static async historyAllTransaksi(req, res) {
     let data = await sq.query(`
     select p."nomorPO", ms."namaSupplier",p."tanggalPO",p."rencanaTglKedatangan",sp."jumlah" as "jumlahBarangPO",stp."jumlahBarangSubTransaksiPO" as "jumlahBarangTransaksi", (sp."jumlah" - stp."jumlahBarangSubTransaksiPO") as "sisa",tp."createdAt", tp."updatedAt", tp."deletedAt" 
@@ -221,33 +222,54 @@ class Controller {
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
 
+  // static async listAllTransaksi(req, res) {
+  //   let data = await sq.query(`
+  //   select p."nomorPO",tp.id as "transaksiPOId",tp."nomorInvoice" ,ms."namaSupplier" ,p."rencanaTglKedatangan" ,p."tanggalPO" ,sum(stp."jumlahBarangSubTransaksiPO") as "jumlahDatang",
+      // 	(select sum(sp.jumlah) as "jumlahOrder" 
+      // 	from "PO" p2 
+      // 	join "subPO" sp on p2.id = sp."POId" 
+      // 	where p2.id = p.id 
+      // 	and sp."deletedAt" isnull) 
+    // from "PO" p 
+      // join "masterSupplier" ms on ms.id = p."masterSupplierId" 
+      // left join "transaksiPO" tp on p.id = tp."POId" 
+      // left join "subTransaksiPO" stp on stp."transaksiPOId" = tp.id 
+    // where p."deletedAt" isnull 
+      // and tp."deletedAt" isnull 
+      // and stp."deletedAt" isnull 
+      // and ms."deletedAt" isnull 
+    // group by p.id , ms."namaSupplier" ,p."nomorPO" ,tp.id `);
+  //   res.status(200).json({ status: 200, message: "sukses", data: data[0] });
+  // }
+
   static async listAllTransaksi(req, res) {
-    let data = await sq.query(`select distinct p."nomorPO", ms."namaSupplier" ,p."rencanaTglKedatangan" ,p."tanggalPO" ,sum(stp."jumlahBarangSubTransaksiPO") as "jumlahDatang",(select distinct sum(sp.jumlah) as "jumlahOrder" from "PO" p2 join "subPO" sp on p2.id = sp."POId" where p2.id = p.id) from "PO" p join "masterSupplier" ms on ms.id = p."masterSupplierId" left join "transaksiPO" tp on p.id = tp."POId" left join "subTransaksiPO" stp on stp."transaksiPOId" = tp.id where p."deletedAt" isnull and tp."deletedAt" isnull and stp."deletedAt" isnull group by p.id , ms."namaSupplier" `);
+    let data = await sq.query(`
+    select distinct tp.id as "transaksiPOId",tp."nomorInvoice" ,p."nomorPO" ,ms."namaSupplier" ,p."rencanaTglKedatangan" ,p."tanggalPO" ,
+      (select sum(stp."jumlahBarangSubTransaksiPO") as "jumlahDatang"
+      from "subTransaksiPO" stp 
+      join "transaksiPO" tp2 on tp2.id = stp."transaksiPOId" 
+      where tp2.id = tp.id 
+      and stp."deletedAt" isnull),
+      (select sum(sp.jumlah) as "jumlahOrder"
+      from "PO" p2
+      join "subPO" sp on sp."POId" = p2.id 
+      where p2.id = p.id 
+      and sp."deletedAt" isnull)
+    from "transaksiPO" tp 
+      join "PO" p on p.id = tp."POId" 
+      join "masterSupplier" ms on ms.id = p."masterSupplierId" 
+    where 
+      tp."deletedAt" isnull 
+      and p."deletedAt" isnull 
+      and ms."deletedAt" isnull `);
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
 
-  // static async update(req, res) {
-  //   const {transaksiPOId,POId,noInvoice,tglKedatangan,keterangan,bulkBarang,gudangId} = req.body;
-    // transaksiPO.update({POId,nomorInvoice: noInvoice,tglKedatangan: tglKedatangan,keterangan: keterangan},{where: {id: transaksiPOId}}).then((data) => {
-    //     // console.log(data);
-    //     for (let i = 0; i < bulkBarang.length; i++) {
-    //       bulkBarang[i].transaksiPOId = transaksiPOId;
-    //       bulkBarang[i].gudangId = gudangId;
-    //     }
-    //     subTransaksiPO.bulkCreate(bulkBarang, {updateOnDuplicate: ["jumlahBarangSubTransaksiPO"]}).then((data) => {
-    //         res.status(200).json({status: 200,message: "sukses"});
-    //       });
-    //   }).catch((err) => {
-    //     console.log(err);
-    //     res.status(500).json({status: 500,message: "gagal",data: err});
-    //   });
-  // }
 
-  static async update(req,res){
-    const {transaksiPOId,POId,noInvoice,tglKedatangan,keterangan,bulkBarang,gudangId} = req.body;
-    
+  static update(req,res){
+    const {transaksiPOId,POId,noInvoice,tglKedatangan,keterangan,bulkBarang,gudangId,statusPO} = req.body;
+
     transaksiPO.findAll({where:{id:transaksiPOId}}).then(async(data)=>{
-      // console.log(data.length);
       if(data.length==0){
         res.status(200).json({status:200,message:"data tidak ada"});
       }else{
@@ -255,13 +277,10 @@ class Controller {
         let mBarang=[];
         let sub = await sq.query(`select stp.id as "subTransaksiPOId",* from "subTransaksiPO" stp join "masterBarang" mb on mb.id = stp."masterBarangId" where stp."deletedAt" isnull and mb."deletedAt" isnull and stp."transaksiPOId" = '${transaksiPOId}'`);
         for (let i = 1; i < sub[0].length; i++) {
-            isi+=` or s."subTransaksiPOId" = '${sub[0][i].subTransaksiPOId}'`;
+          isi+=` or s."subTransaksiPOId" = '${sub[0][i].subTransaksiPOId}'`;
         }
         let mStock = await sq.query(`select * from stock s where s."deletedAt" isnull and s."subTransaksiPOId" = '${sub[0][0].subTransaksiPOId}'${isi}`);
-        // console.log("==================SubL===================");
         // console.log(sub[0]);
-        // console.log("================SL=====================");
-        // console.log(mStock[0]);
         for (let j = 0; j < bulkBarang.length; j++) {
           for (let k = 0; k < sub[0].length; k++) {
             if(bulkBarang[j].masterBarangId==sub[0][k].masterBarangId){
@@ -275,19 +294,15 @@ class Controller {
             }
           }
         }
-        // console.log("**********************************************");
-        // console.log("==================SubB===================");
-        // console.log(sub[0]);
-        // console.log("================SB=====================");
-        // console.log(mStock[0]);
-        // console.log("================B=====================");
         // console.log(mBarang);
         transaksiPO.update({POId,nomorInvoice: noInvoice,tglKedatangan: tglKedatangan,keterangan: keterangan},{where: {id: transaksiPOId}}).then((data2)=>{
-         subTransaksiPO.bulkCreate(bulkBarang,{updateOnDuplicate:["hargaTransaksi","jumlahHargaPerItem","jumlahBarangSubTransaksiPO"]}).then((data3)=>{
-          stock.bulkCreate(mStock[0],{updateOnDuplicate:["jumlahStock"]}).then((data4)=>{
-            masterBarang.bulkCreate(mBarang,{updateOnDuplicate:["jumlahTotalBarang"]}).then((data5)=>{
-              res.status(200).json({status:200,message:"sukses"});
-            }).catch((err)=>{
+          subTransaksiPO.bulkCreate(bulkBarang,{updateOnDuplicate:["hargaTransaksi","jumlahHargaPerItem","jumlahBarangSubTransaksiPO"]}).then((data3)=>{
+           stock.bulkCreate(mStock[0],{updateOnDuplicate:["jumlahStock"]}).then((data4)=>{
+             masterBarang.bulkCreate(mBarang,{updateOnDuplicate:["jumlahTotalBarang"]}).then((data5)=>{
+               PO.update({statusPO},{where:{id:POId}}).then((data5)=>{
+                res.status(200).json({status:200,message:"sukses"});
+               });
+             }).catch((err)=>{
               console.log("MB",err);
               res.status(500).json({status:500,message:"gagal",data:err})
             });
@@ -299,41 +314,16 @@ class Controller {
           console.log("subBulk",err);
           res.status(500).json({status:500,message:"gagal",data:err});
          });
-        }).catch((err)=>{
-          console.log("update",err);
-          res.status(500).json({status:500,message:"gagal",data:err});
-        });
+         }).catch((err)=>{
+           console.log("update",err);
+           res.status(500).json({status:500,message:"gagal",data:err});
+         });
       }
     }).catch((err)=>{
-      console.log("findAll",err);
-      res.status(500).json({status:500,message:"gagal",data:err});
-    })
+      console.log("find-all",err);
+      res.status(500).json({status: 500,message: "gagal",data: err});
+    });
   }
-
-
-  // static updateBarang(req, res) {
-  //   const { transaksiPOId, bulkBarang, gudangId } = req.body;
-  //   subTransaksiPO
-  //     .destroy({
-  //       where: {
-  //         transaksiPOId: transaksiPOId,
-  //       },
-  //     })
-  //     .then((hasil) => {
-  //       console.log(bulkBarang);
-  //       for (let i = 0; i < bulkBarang.length; i++) {
-  //         bulkBarang[i].id = uuid_v4();
-  //         bulkBarang[i].transaksiPOId = transaksiPOId;
-  //         bulkBarang[i].gudangId = gudangId;
-  //       }
-  //       subTransaksiPO.bulkCreate(bulkBarang).then((hasil2) => {
-  //         res.status(200).json({ status: 200, message: "sukses" });
-  //       });
-  //     })
-  //     .catch((err) => {
-  //       res.status(500).json({ status: 500, message: "gagal", data: err });
-  //     });
-  // }
 
   static async delete(req, res) {
     const { id } = req.body;
@@ -352,26 +342,25 @@ class Controller {
       // console.log(mBarang);
       // console.log("----ST------");
       // console.log(subTp);
-      // res.send("oke");
       transaksiPO.destroy({where: {id:id}}).then((data2) => {
           subTransaksiPO.destroy({where: {transaksiPOId: id}}).then((data3) => {
              masterBarang.bulkCreate(mBarang,{updateOnDuplicate:['jumlahTotalBarang']}).then((data4)=>{
                stock.destroy({where:{subTransaksiPOId:subTp}}).then((data5)=>{
                  res.status(200).json({status:200,message:"sukses"});
                }).catch((err) => {
-                 console.log("stock");
+                 console.log("stock",err);
                 res.status(500).json({status: 500,message: "gagal",data: err});
               });
              }).catch((err) => {
-              console.log("MB");
+              console.log("MB",err);
              res.status(500).json({status: 500,message: "gagal",data: err});
             });
           }).catch((err) => {
-            console.log("SUB");
+            console.log("SUB",err);
            res.status(500).json({status: 500,message: "gagal",data: err});
           });
         }).catch((err) => {
-          console.log("TPO");
+          console.log("TPO",err);
           res.status(500).json({status: 500,message: "gagal",data: err});
       });
     }

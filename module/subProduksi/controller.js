@@ -46,8 +46,7 @@ class Controller {
   static async detailsById(req, res) {
     const { spId } = req.params;
     // let data = await sq.query(`select sp.id as "subProduksiId", sp."jumlahBahanProduksi" ,sp."createdAt" ,sp."updatedAt" ,sp."deletedAt" ,sp."produksiId" , sp."masterBarangId" ,mb."namaBarang", sp."masterUserId" ,mu.nama as "namaUser" ,sp."stockId",s."batchNumber", s."jumlahStock" from "subProduksi" sp join "masterBarang" mb on mb.id = sp."masterBarangId" join "masterUser" mu on mu.id = sp."masterUserId" join stock s on s."masterBarangId" = sp."masterBarangId" where sp."deletedAt" isnull and mb."deletedAt" isnull and mu."deletedAt" isnull and s."deletedAt" isnull and sp.id = '${id}'`);
-    let data = await sq.query(`select sp.id as "subProduksiId",sp."jumlahBahanProduksi",sp."produksiId",p."kodeBatch",p."kodeProduksi",p."tanggalProduksi",p."jumlahProduksi",p."realisasiJumlahProduksi",p."formulaId",f."keteranganFormula",sp."masterBarangId",mb."namaBarang",sp."stockId",s."batchNumber",s."tanggalKadaluarsa",s."hargaBeliSatuanStock",s."gudangId",g."namaGudang",g."kodeGudang" ,sp."masterUserId",mu.nama,mu."NIP",sp."PICSubProduksi",sp."tanggalKeluarSubProduksi",sp."createdAt" ,sp."deletedAt" 
-    from "subProduksi" sp join "masterBarang" mb on mb.id = sp."masterBarangId" join produksi p on p.id = sp."produksiId" join formula f on f.id = p."formulaId" join stock s on s.id = sp."stockId" join gudang g on g.id = s."gudangId" join "masterUser" mu on mu.id = sp."masterUserId" where sp."deletedAt" isnull and mb."deletedAt" isnull and p."deletedAt" isnull and s."deletedAt" isnull and mu."deletedAt" isnull and f."deletedAt" isnull and g."deletedAt" isnull and sp.id = '${spId}' order by sp."createdAt"`);
+    let data = await sq.query(`select sp.id as "subProduksiId",sp."jumlahBahanProduksi",sp."produksiId",p."kodeBatch",p."kodeProduksi",p."tanggalProduksi",p."jumlahProduksi",p."realisasiJumlahProduksi",p."formulaId",f."keteranganFormula",sp."masterBarangId",mb."namaBarang",sp."stockId",s."batchNumber",s."tanggalKadaluarsa",s."hargaBeliSatuanStock",s."gudangId",g."namaGudang",g."kodeGudang" ,sp."masterUserId",mu.nama,mu."NIP",sp."PICSubProduksi",sp."tanggalKeluarSubProduksi",sp."createdAt" ,sp."deletedAt" from "subProduksi" sp join "masterBarang" mb on mb.id = sp."masterBarangId" join produksi p on p.id = sp."produksiId" join formula f on f.id = p."formulaId" join stock s on s.id = sp."stockId" join gudang g on g.id = s."gudangId" join "masterUser" mu on mu.id = sp."masterUserId" where sp."deletedAt" isnull and mb."deletedAt" isnull and p."deletedAt" isnull and s."deletedAt" isnull and mu."deletedAt" isnull and f."deletedAt" isnull and g."deletedAt" isnull and sp.id = '${spId}' order by sp."createdAt"`);
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
 
@@ -56,11 +55,11 @@ class Controller {
     if(!masterUserId){
       masterUserId = req.dataUsers.id;
     }
-    let mBarang = ``
-    let mData = ``
+    let mBarang = ``;
+    let mData = ``;
     for (let i = 1; i < bulkSubProduksi.length; i++) {
-        mData+=` or s."masterBarangId" = '${bulkSubProduksi[i].masterBarangId}' and s."batchNumber" ='${bulkSubProduksi[i].kodeBatch}'`;
-        mBarang+=` or mb.id='${bulkSubProduksi[i].masterBarangId}'`;
+      mData+=` or s."masterBarangId" = '${bulkSubProduksi[i].masterBarangId}' and s."batchNumber" ='${bulkSubProduksi[i].kodeBatch}'`;
+      mBarang+=` or mb.id='${bulkSubProduksi[i].masterBarangId}'`;
     }
     let data = await sq.query(`select *,(select mb."namaBarang" from "masterBarang" mb where mb.id = s."masterBarangId") from stock s where s."deletedAt" isnull and (s."masterBarangId" = '${bulkSubProduksi[0].masterBarangId}' and s."batchNumber" ='${bulkSubProduksi[0].kodeBatch}'${mData})`);
     let barang = await sq.query(`select * from "masterBarang" mb where mb."deletedAt" isnull and mb.id='${bulkSubProduksi[0].masterBarangId}'${mBarang}`);
@@ -68,152 +67,94 @@ class Controller {
     if(data[0].length==0){
       res.status(200).json({status:200,message:"stock tidak ada"});
     }else{
-      let cek = false;
-      let tBarang = [];
-      let bulkStock = [];
-      // let barangStock = [];
-    
+      let cekBarang = false;
+      let tmpBarang = [];
+
       for (let j = 0; j < bulkSubProduksi.length; j++) {
-        for (let k = 0; k < data[0].length; k++) {
-          if(data[0][k].masterBarangId==bulkSubProduksi[j].masterBarangId){
-            if(bulkSubProduksi[j].jumlahBahanProduksi>data[0][k].jumlahStock){
-              tBarang.push({nama:data[0][j].namaBarang, jmlStock:data[0][j].jumlahStock, jmlBahanProduksi:bulkSubProduksi[k].jumlahBahanProduksi});
-              cek = true;
+        for (let k = 0; k < barang[0].length; k++) {
+          if(bulkSubProduksi[j].masterBarangId == barang[0][k].id){
+            if(bulkSubProduksi[j].jumlahBahanProduksi > barang[0][k].jumlahTotalBarang){
+              cekBarang = true;
+              tmpBarang.push({namaBarang:barang[0][k].namaBarang,jumlahTotalBarang:barang[0][k].jumlahTotalBarang,jumlahBahanProduksi:bulkSubProduksi[j].jumlahBahanProduksi});
             }
-            bulkStock.push({id:data[0][k].id,namaBarang:data[0][k].namaBarang,jumlahStock:data[0][k].jumlahStock-bulkSubProduksi[j].jumlahBahanProduksi})
-            bulkSubProduksi[j].id = uuid_v4();
-            bulkSubProduksi[j].produksiId=produksiId;
-            bulkSubProduksi[j].tanggalKeluarSubProduksi= tanggalKeluarSubProduksi;
-            bulkSubProduksi[j].PICSubProduksi=PICSubProduksi;
-            bulkSubProduksi[j].masterUserId=masterUserId;
-            bulkSubProduksi[j].stockId=data[0][k].id;
           }
         }
       }
-      if(cek){
-        res.status(200).json({status:200,message:"stock tidak cukup",tBarang});
-      }else{
-        subProduksiM.bulkCreate(bulkSubProduksi).then((data2)=>{
-          stock.bulkCreate(bulkStock,{updateOnDuplicate:['jumlahStock']}).then((data3)=>{
-            for (let l = 0; l < barang[0].length; l++) {
-              for (let m = 0; m < bulkSubProduksi.length; m++) {
-                if(barang[0][l].id==bulkSubProduksi[m].masterBarangId){
-                  barang[0][l].jumlahTotalBarang-=bulkSubProduksi[m].jumlahBahanProduksi
+      if(cekBarang){
+        res.status(200).json({status:200,message:"booked",data:tmpBarang});
+      }
+      else{
+        let cek = false;
+        let tBarang = [];
+        let bulkStock = [];
+
+        for (let j = 0; j < bulkSubProduksi.length; j++) {
+          for (let k = 0; k < data[0].length; k++) {
+            if(data[0][k].masterBarangId==bulkSubProduksi[j].masterBarangId){
+              if(bulkSubProduksi[j].jumlahBahanProduksi>data[0][k].jumlahStock){
+                tBarang.push({nama:data[0][j].namaBarang, jmlStock:data[0][j].jumlahStock, jmlBahanProduksi:bulkSubProduksi[k].jumlahBahanProduksi});
+                cek = true;
+              }
+              bulkStock.push({id:data[0][k].id,namaBarang:data[0][k].namaBarang,jumlahStock:data[0][k].jumlahStock-bulkSubProduksi[j].jumlahBahanProduksi})
+              bulkSubProduksi[j].id = uuid_v4();
+              bulkSubProduksi[j].produksiId=produksiId;
+              bulkSubProduksi[j].tanggalKeluarSubProduksi= tanggalKeluarSubProduksi;
+              bulkSubProduksi[j].PICSubProduksi=PICSubProduksi;
+              bulkSubProduksi[j].masterUserId=masterUserId;
+              bulkSubProduksi[j].stockId=data[0][k].id;
+            }
+          }
+        }
+        if(cek){
+          res.status(200).json({status:200,message:"stock tidak cukup",data:tBarang});
+        }else{
+          subProduksiM.bulkCreate(bulkSubProduksi).then((data2)=>{
+            stock.bulkCreate(bulkStock,{updateOnDuplicate:['jumlahStock']}).then((data3)=>{
+              for (let l = 0; l < barang[0].length; l++) {
+                for (let m = 0; m < bulkSubProduksi.length; m++) {
+                  if(barang[0][l].id==bulkSubProduksi[m].masterBarangId){
+                    barang[0][l].jumlahTotalBarang-=bulkSubProduksi[m].jumlahBahanProduksi
+                  }
                 }
               }
-            }
-            // console.log("=============BR=============");
-            // console.log(barang[0]);
-            masterBarang.bulkCreate(barang[0],{updateOnDuplicate:["jumlahTotalBarang"]}).then((data4)=>{
-              res.status(200).json({status:200,message:"sukses"});
+              masterBarang.bulkCreate(barang[0],{updateOnDuplicate:["jumlahTotalBarang"]}).then((data4)=>{
+                res.status(200).json({status:200,message:"sukses"});
+              }).catch((err)=>{
+                console.log("MB");
+                res.status(500).json({ status: 500, message: "gagal", data: err });
+              });
             }).catch((err)=>{
-              console.log("MB");
-              res.status(500).json({ status: 500, message: "gagal", data: err });
+            console.log("STOCK");
+            res.status(500).json({ status: 500, message: "gagal", data: err });
             });
           }).catch((err)=>{
-          console.log("STOCK");
-          res.status(500).json({ status: 500, message: "gagal", data: err });
+            console.log("SUB");
+            res.status(500).json({ status: 500, message: "gagal", data: err });
           });
-        }).catch((err)=>{
-          console.log("SUB");
-          res.status(500).json({ status: 500, message: "gagal", data: err });
-        });
+        }
       }
-    // console.log("=============D=============");
-    // console.log(data[0]);
-    // console.log("=============B=============");
-    // console.log(barang[0]);
-    // console.log("============BS==============");
-    // console.log(bulkStock);
-    // console.log("===========SB===============");
-    // console.log(barangStock);
-    // console.log("==========BSUB================");
-    // console.log(bulkSubProduksi);
     }
   }
-  // static async update(req,res){
-  //   let {produksiId,tanggalKeluarSubProduksi,PICSubProduksi,masterUserId,bulkSubProduksi}=req.body;
-  //   if(!masterUserId){
-  //     masterUserId = req.dataUsers.id;
-  //   }
-  //   let mBarang = ``
-  //   let mData = ``
-  //   let mSub = ``
-  //   for (let i = 1; i < bulkSubProduksi.length; i++) {
-  //       mData+=` or s."masterBarangId" = '${bulkSubProduksi[i].masterBarangId}' and s."batchNumber" ='${bulkSubProduksi[i].kodeBatch}'`;
-  //       mBarang+=` or mb.id='${bulkSubProduksi[i].masterBarangId}'`;
-  //       mSub+=` or sp.id='${bulkSubProduksi[i].subProduksiId}'`;
-  //   }
-  //   let data = await sq.query(`select *,(select mb."namaBarang" from "masterBarang" mb where mb.id = s."masterBarangId") from stock s where s."deletedAt" isnull and (s."masterBarangId" = '${bulkSubProduksi[0].masterBarangId}' and s."batchNumber" ='${bulkSubProduksi[0].kodeBatch}'${mData})`);
-  //   let barang = await sq.query(`select * from "masterBarang" mb where mb."deletedAt" isnull and mb.id='${bulkSubProduksi[0].masterBarangId}'${mBarang}`);
-  //   let subP = await sq.query(`select * from "subProduksi" sp where sp."deletedAt" isnull and sp.id = '${bulkSubProduksi[0].subProduksiId}'${mSub}`);
-  //   // let total =[];
-  //   // console.log(data[0]);
-  //   // console.log("=====================");
-  //   // console.log(subP[0]);
 
-  //   for (let l = 0; l < subP[0].length; l++) {
-  //     for (let m = 0; m < bulkSubProduksi.length; m++) {
-  //       if(subP[0][l].id==bulkSubProduksi[m].subProduksiId){
-  //         bulkSubProduksi[m].jumlahBahanProduksi = subP[0][l].jumlahBahanProduksi-bulkSubProduksi[m].jumlahBahanProduksi;
-  //       }
-  //     }
-  //   }
-  //   console.log(data[0]);
-  //   // console.log(bulkSubProduksi);
-  //   // res.send("oke")
-
-  //   if(subP[0]==0){
-  //     res.status(200).json({status:200,message:"data sub produksi tidak ada"});
-  //   }else{
-  //     let cek = false;
-  //     let tBarang = [];
-  //     let bulkStock = [];
-  //     for (let j = 0; j < bulkSubProduksi.length; j++) {
-  //       for (let k = 0; k < data[0].length; k++) {
-  //         if(data[0][k].masterBarangId==bulkSubProduksi[j].masterBarangId){
-  //           if(bulkSubProduksi[j].jumlahBahanProduksi>data[0][k].jumlahStock){
-  //             tBarang.push({nama:data[0][j].namaBarang, jmlStock:data[0][j].jumlahStock, jmlBahanProduksi:bulkSubProduksi[k].jumlahBahanProduksi});
-  //             cek = true;
-  //           }
-  //           bulkStock.push({id:data[0][k].id,namaBarang:data[0][k].namaBarang,jumlahStock:data[0][k].jumlahStock+bulkSubProduksi[j].jumlahBahanProduksi});
-  //           bulkSubProduksi[j].produksiId=produksiId;
-  //           bulkSubProduksi[j].tanggalKeluarSubProduksi= tanggalKeluarSubProduksi;
-  //           bulkSubProduksi[j].PICSubProduksi=PICSubProduksi;
-  //           bulkSubProduksi[j].masterUserId=masterUserId;
-  //           bulkSubProduksi[j].stockId=data[0][k].id;
-  //         }
-  //       }
-  //     }
-  //     console.log(bulkStock);
-  //     console.log(bulkSubProduksi);
-  //   }
-
-  //   // console.log("=================Bulk=================");
-  //   // console.log(bulkSubProduksi);
-  //   // console.log("===============D===================");
-  //   // console.log(data[0]);
-  //   // console.log("===============B===================");
-  //   // console.log(barang[0]);
-  //   // console.log(bulkStock);
-  //   res.send("oke")
-  // }
-
-  static async update(req,res){
+  static update (req,res){
     let {produksiId,tanggalKeluarSubProduksi,PICSubProduksi,masterUserId,bulkSubProduksi}=req.body;
     if(!masterUserId){
       masterUserId = req.dataUsers.id;
     }
-    // let data = await sq.query(`select sp.id as "subProduksiId",* from "subProduksi" sp join produksi p on p.id = sp."produksiId" join stock s ON sp."stockId" = s.id join "masterBarang" mb on mb.id = sp."masterBarangId" where sp."deletedAt" isnull and s."deletedAt" isnull and mb."deletedAt" isnull and p."deletedAt" isnull and sp."produksiId" = '${produksiId}' and sp."tanggalKeluarSubProduksi" ='${moment(tanggalKeluarSubProduksi).format()}'`);
     subProduksiM.findAll(({where:{produksiId,tanggalKeluarSubProduksi},raw:true})).then(async(data)=>{
       if(data.length==0){
         res.status(200).json({status:200,message:"data tidak ada"});
       }else{
+        let cekBarang = false;
+        let cekStok = false;
         let stIsi = ``;
         let bIsi=``;
         let mStok=[];
         let idStock=[];
         let mBarang=[];
+        let sBarang=[];
+        let sStok=[];
+       
         for (let i = 0; i < data.length; i++) {
           if(i>0){
             stIsi+= ` or s.id='${data[i].stockId}'`;
@@ -227,9 +168,7 @@ class Controller {
         let bStock = await sq.query(`select s.id as "stockId", * from stock s join "masterBarang" mb on mb.id = s."masterBarangId" where s."deletedAt" isnull and s."deletedAt" isnull and s."masterBarangId" = '${bulkSubProduksi[0].masterBarangId}' and s."batchNumber" = '${bulkSubProduksi[0].kodeBatch}'${bIsi}`);
         let allStock = [...mStock[0],...bStock[0]];
         let tmp = [...new Map(allStock.map(item => [item['stockId'], item])).values()];
-        // console.log("==========================");
-        // console.log(tmp);
-        // console.log("==========================");
+        
         for (let k = 0; k < tmp.length; k++) {
           for (let l = 0; l < data.length; l++) {
             if(tmp[k].stockId==data[l].stockId && tmp[k].masterBarangId==data[l].masterBarangId){
@@ -239,11 +178,16 @@ class Controller {
           }
           for (let m = 0; m < bulkSubProduksi.length; m++) {
             if(tmp[k].masterBarangId == bulkSubProduksi[m].masterBarangId && tmp[k].batchNumber == bulkSubProduksi[m].kodeBatch){
+              if(tmp[k].jumlahTotalBarang < bulkSubProduksi[m].jumlahBahanProduksi){
+                cekBarang=true;
+                sBarang.push({namaBarang:tmp[k].namaBarang,jumlahTotalBarang:tmp[k].jumlahTotalBarang,jumlahBahanProduksi:bulkSubProduksi[m].jumlahBahanProduksi});
+              }
+              if(tmp[k].jumlahStock < bulkSubProduksi[m].jumlahBahanProduksi){
+                cekStok=true;
+                sStok.push({namaBarang:tmp[k].namaBarang,jumlahStock:tmp[k].jumlahStock,jumlahBahanProduksi:bulkSubProduksi[m].jumlahBahanProduksi});
+              }
               tmp[k].jumlahStock-=bulkSubProduksi[m].jumlahBahanProduksi;
               tmp[k].jumlahTotalBarang-=bulkSubProduksi[m].jumlahBahanProduksi;
-              if(tmp[k].jumlahTotalBarang<0){
-                tmp[k].jumlahTotalBarang=0
-              }
               bulkSubProduksi[m].id=uuid_v4();
               bulkSubProduksi[m].PICSubProduksi=PICSubProduksi;
               bulkSubProduksi[m].tanggalKeluarSubProduksi=tanggalKeluarSubProduksi;
@@ -255,32 +199,43 @@ class Controller {
           mStok.push({id:tmp[k].stockId,batchNumber:tmp[k].batchNumber,jumlahStock:tmp[k].jumlahStock});
           mBarang.push({id:tmp[k].masterBarangId,namaBarang:tmp[k].namaBarang,jumlahTotalBarang:tmp[k].jumlahTotalBarang});
         }
-
-        subProduksiM.destroy({where:{id:idStock}}).then((data2)=>{
-          subProduksiM.bulkCreate(bulkSubProduksi).then((data3)=>{
-            stock.bulkCreate(mStok,{updateOnDuplicate:["jumlahStock"]}).then((data4)=>{
-              masterBarang.bulkCreate(mBarang,{updateOnDuplicate:["jumlahTotalBarang"]}).then((data5)=>{
-                res.status(200).json({status:200,message:"sukses"})
+        // console.log("===========tmp==============");
+        // console.log(tmp);
+        // console.log("===========mstok==============");
+        // console.log(mStok);
+        // console.log("===========mBarang==============");
+        // console.log(mBarang);
+        
+        if(cekBarang){
+          res.status(200).json({status:200,message:"booked",data:sBarang});
+        }else{
+          if(cekStok){
+            res.status(200).json({status:200,message:"stock tidak cukup",data:sStok});
+          }else{
+            subProduksiM.destroy({where:{id:idStock}}).then((data2)=>{
+              subProduksiM.bulkCreate(bulkSubProduksi).then((data3)=>{
+                stock.bulkCreate(mStok,{updateOnDuplicate:["jumlahStock"]}).then((data4)=>{
+                  masterBarang.bulkCreate(mBarang,{updateOnDuplicate:["jumlahTotalBarang"]}).then((data5)=>{
+                    res.status(200).json({status:200,message:"sukses"})
+                  }).catch((err)=>{
+                    console.log("MB",err);
+                    res.status(500).json({status:500,message:"gagal",data:err});
+                  });
+                }).catch((err)=>{
+                  console.log("stock",err);
+                  res.status(500).json({status:500,message:"gagal",data:err});
+                });
               }).catch((err)=>{
-                console.log("MB",err);
+                console.log("sub-Bulk",err);
                 res.status(500).json({status:500,message:"gagal",data:err});
-              });
+              })
             }).catch((err)=>{
-              console.log("stock",err);
+              console.log("destroy",err);
               res.status(500).json({status:500,message:"gagal",data:err});
             });
-          }).catch((err)=>{
-            console.log("sub-Bulk",err);
-            res.status(500).json({status:500,message:"gagal",data:err});
-          })
-        }).catch((err)=>{
-          console.log("destroy",err);
-          res.status(500).json({status:500,message:"gagal",data:err});
-        });
+          }
+        }
       }
-    }).catch((err)=>{
-      console.log("find-all",err);
-      res.status(500).json({status:500,message:"gagal",data:err});
     });
   }
   

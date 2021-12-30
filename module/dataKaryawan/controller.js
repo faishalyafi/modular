@@ -27,33 +27,25 @@ class Controller {
   }
 
   static update(req, res) {
-   const {dataKaryawanId,namaKaryawan,nomorKTPKaryawan,tinggiBadanKaryawan,beratBadanKaryawan,agamaKaryawan,kebangsaanKaryawan,jenisKelaminKaryawan,statusKaryawan,tempatLahirKaryawan,tanggalLahirKaryawan,noHpKaryawan,emailKaryawan,alamatKaryawan,tanggalMulaiKerja,statusKerjaKaryawan,lamaKontrakKaryawan,namaIstriKaryawan,KTPIstriKaryawan,alamatIstriKaryawan,jumlahAnakKaryawan,namaAnak1Karyawan,namaAnak2Karyawan,masterPosisiId,masterDivisiId,nomorAsuransi,potonganAsuransi,masterAsuransiId} = req.body;
-
-   if(req.files){
-     if(req.files.file1[0]){
-      let fotoProfilKaryawan = req.files.file1[0].filename;
-      dataKaryawan.update({fotoProfilKaryawan},{where:{id:dataKaryawanId}});
-     }
-     if(req.files.file2[0]){
-      let fotoKKKaryawan = req.files.file2[0].filename;
-      dataKaryawan.update({fotoKKKaryawan},{where:{id:dataKaryawanId}});
-     }
-   }
-   
-   dataKaryawan.update({namaKaryawan,nomorKTPKaryawan,tinggiBadanKaryawan,beratBadanKaryawan,agamaKaryawan,kebangsaanKaryawan,jenisKelaminKaryawan,statusKaryawan,tempatLahirKaryawan,tanggalLahirKaryawan,noHpKaryawan,emailKaryawan,alamatKaryawan,tanggalMulaiKerja,statusKerjaKaryawan,lamaKontrakKaryawan,namaIstriKaryawan,KTPIstriKaryawan,alamatIstriKaryawan,jumlahAnakKaryawan,namaAnak1Karyawan,namaAnak2Karyawan,masterPosisiId,masterDivisiId},{where:{id:dataKaryawanId}}).then((data)=>{
-   if(masterAsuransiId){
-     poolPotonganAsuransi.destroy({where:{masterAsuransiId,dataKaryawanId}}).then((data2)=>{
-      poolPotonganAsuransi.create({id:uuid_v4(),nomorAsuransi,potonganAsuransi,masterAsuransiId,dataKaryawanId}).then((data3)=>{
-        res.status(200).json({ status: 200, message: "sukses"});
+      const {dataKaryawanId,namaKaryawan,nomorKTPKaryawan,tinggiBadanKaryawan,beratBadanKaryawan,agamaKaryawan,kebangsaanKaryawan,jenisKelaminKaryawan,statusKaryawan,tempatLahirKaryawan,tanggalLahirKaryawan,noHpKaryawan,emailKaryawan,alamatKaryawan,tanggalMulaiKerja,statusKerjaKaryawan,lamaKontrakKaryawan,namaIstriKaryawan,KTPIstriKaryawan,alamatIstriKaryawan,jumlahAnakKaryawan,namaAnak1Karyawan,namaAnak2Karyawan,masterPosisiId,masterDivisiId} = req.body;
+    
+      if(req.files){
+        if(req.files.file1){
+        let fotoProfilKaryawan = req.files.file1[0].filename;
+        dataKaryawan.update({fotoProfilKaryawan},{where:{id:dataKaryawanId}});
+        } 
+        if(req.files.file2){
+        let fotoKKKaryawan = req.files.file2[0].filename;
+        dataKaryawan.update({fotoKKKaryawan},{where:{id:dataKaryawanId}});
+        }
+      }
+      
+      dataKaryawan.update({namaKaryawan,nomorKTPKaryawan,tinggiBadanKaryawan,beratBadanKaryawan,agamaKaryawan,kebangsaanKaryawan,jenisKelaminKaryawan,statusKaryawan,tempatLahirKaryawan,tanggalLahirKaryawan,noHpKaryawan,emailKaryawan,alamatKaryawan,tanggalMulaiKerja,statusKerjaKaryawan,lamaKontrakKaryawan,namaIstriKaryawan,KTPIstriKaryawan,alamatIstriKaryawan,jumlahAnakKaryawan,namaAnak1Karyawan,namaAnak2Karyawan,masterPosisiId,masterDivisiId},{where:{id:dataKaryawanId}}).then((data)=>{
+       res.status(200).json({ status: 200, message: "sukses"});
+      }).catch((err)=>{
+       res.status(500).json({status: 500,message: "gagal",data: err});
       });
-     });
-   }else{
-    res.status(200).json({ status: 200, message: "sukses"});
-   }
-  }).catch((err)=>{
-    res.status(500).json({status: 500,message: "gagal",data: err});
-   });
-  }
+    }
 
   static delete(req, res) {
     const {dataKaryawanId} = req.body;
@@ -90,26 +82,6 @@ class Controller {
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
 
-  // static update(req, res) {
-  //   const {dataKaryawanId,namaKaryawan,nomorKTPKaryawan,tinggiBadanKaryawan,beratBadanKaryawan,agamaKaryawan,kebangsaanKaryawan,jenisKelaminKaryawan,statusKaryawan,tempatLahirKaryawan,tanggalLahirKaryawan,noHpKaryawan,emailKaryawan,alamatKaryawan,tanggalMulaiKerja,statusKerjaKaryawan,lamaKontrakKaryawan,namaIstriKaryawan,KTPIstriKaryawan,alamatIstriKaryawan,jumlahAnakKaryawan,namaAnak1Karyawan,namaAnak2Karyawan,masterPosisiId,masterDivisiId} = req.body;
- 
-  //   if(req.files){
-  //     if(req.files.file1[0]){
-  //      let fotoProfilKaryawan = req.files.file1[0].filename;
-  //      dataKaryawan.update({fotoProfilKaryawan},{where:{id:dataKaryawanId}});
-  //     } 
-  //     if(req.files.file2[0]){
-  //      let fotoKKKaryawan = req.files.file2[0].filename;
-  //      dataKaryawan.update({fotoKKKaryawan},{where:{id:dataKaryawanId}});
-  //     }
-  //   }
-    
-  //   dataKaryawan.update({namaKaryawan,nomorKTPKaryawan,tinggiBadanKaryawan,beratBadanKaryawan,agamaKaryawan,kebangsaanKaryawan,jenisKelaminKaryawan,statusKaryawan,tempatLahirKaryawan,tanggalLahirKaryawan,noHpKaryawan,emailKaryawan,alamatKaryawan,tanggalMulaiKerja,statusKerjaKaryawan,lamaKontrakKaryawan,namaIstriKaryawan,KTPIstriKaryawan,alamatIstriKaryawan,jumlahAnakKaryawan,namaAnak1Karyawan,namaAnak2Karyawan,masterPosisiId,masterDivisiId},{where:{id:dataKaryawanId}}).then((data)=>{
-  //    res.status(200).json({ status: 200, message: "sukses"});
-  //   }).catch((err)=>{
-  //    res.status(500).json({status: 500,message: "gagal",data: err});
-  //   });
-  //  }
 }
 
 module.exports = Controller;

@@ -201,6 +201,7 @@ class Controller {
     // console.log(data[0]);
     // console.log("==================================");
     // console.log(TOP[0]);
+
     let jmlBonus = 0;
     let jmlBarang = 0;
     for (let i = 0; i < TOP[0].length; i++) {
@@ -218,6 +219,27 @@ class Controller {
     }
     // console.log(data[0]);
     res.status(200).json({ status: 200, message: "sukses", data: data[0] })
+  }
+
+  static async listBarangTransaksiOPByNoOP(req, res) {
+    const {nomorOP} = req.body;
+    // let data = await sq.query(`select sto.id as "subTransaksiId", sto.*,(select sum(so."jumlahBarangSubOP") as "totalBarangSubOP" from "subOP" so join "OP" o2 on o2.id = so."OPId" where o2."deletedAt" isnull and so."deletedAt" isnull and o2.id = o.id),(select sum(sto2."jumlahBarangOP") as "totalBarangSubTransaksiOP" from "subTransaksiOP" sto2 join "transaksiOP" to3 on to3.id = sto2."transaksiOPId" where sto2."deletedAt" isnull and to3."deletedAt" isnull and sto2."transaksiOPId" = to2.id) from "subTransaksiOP" sto join "transaksiOP" to2 on to2.id = sto."transaksiOPId" join "OP" o on o.id = to2."OPId" where sto."deletedAt" isnull and to2."deletedAt" isnull and o."deletedAt" isnull and o."nomorOP" = '${nomorOP}'`);
+    let data =  await sq.query(`select sto.id as "subTransaksiOPId",sto.*,s."batchNumber",s."masterBarangId",mb."namaBarang",(select sum(so."jumlahBarangSubOP") as "totalBarangSubOP" from "subOP" so join "OP" o2 on o2.id = so."OPId" where o2."deletedAt" isnull and so."deletedAt" isnull and o2.id = o.id) from "subTransaksiOP" sto join "transaksiOP" to2 on to2.id = sto."transaksiOPId" join "OP" o on o.id = to2."OPId" join stock s on s.id = sto."stockId" join "masterBarang" mb on mb.id = s."masterBarangId" where sto."deletedAt" isnull and to2."deletedAt" isnull and o."deletedAt" isnull and s."deletedAt" isnull and mb."deletedAt" isnull and o."nomorOP" = '${nomorOP}' order by sto."createdAt" `)
+    let total = 0;
+    let jml= 0;
+    for (let i = 0; i < data[0].length; i++) {
+      total+=data[0][i].jumlahBarangOP;
+      if(data[0][i].isBonus){
+        jml+=data[0][i].jumlahBarangOP;
+      }
+    }
+    for (let j = 0; j < data[0].length; j++) {
+      data[0][j].totalBarangSubTransaksiOP = total;
+      data[0][j].totalJumlahBarangBonus = jml;
+      data[0][j].totalBarangDikirim = total-jml;
+      data[0][j].totalBarangBelumDikirim = data[0][0].totalBarangSubOP - (total-jml);
+    }
+    res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
 
   static async list(req, res) {
@@ -489,6 +511,29 @@ class Controller {
     const { tahun } = req.params
     let data = await sq.query(`select date_part('month',o."tanggalOrderOP") as bulan ,sum(o."totalHargaOP") from "OP" o where date_part('year',o."tanggalOrderOP") = ${tahun} and o."deletedAt" isnull group by bulan `)
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
+  }
+
+  static delete (req,res){
+    const {OPId} = req.body;
+    OP.findAll({where:{id:OPId}}).then((data)=>{
+      if(data.length==0){
+        res.status(200).json({status:200,message:"data tidak ada"});
+      }else{
+        if(data[0].statusOP>1){
+          res.status(200).json({status:200,message:"data tidak dapat dihapus"});
+        }else{
+          OP.destroy({where:{id:OPId}}).then((data2)=>{
+            subOP.destroy({where:{OPId}}).then((data3)=>{
+              masterPiutang.destroy({where:{OPId}}).then((data4)=>{
+                res.status(200).json({status:200,message:"sukses"});
+              });
+            });
+          });
+        }
+      }
+    }).catch((err)=>{
+      res.status(500).json({status:500,message:gagal,data:err});
+    });
   }
 }
 module.exports = Controller;
