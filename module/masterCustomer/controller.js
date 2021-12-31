@@ -5,18 +5,18 @@ const sq = require("../../config/connection");
 
 class Customer {
 	static register(req, res) {
-		let { namaCustomer, alamatLengkap, masterKategoriCustomerId, kodePos, nomorTelepon, email, longitude, latitude, provinsiId, kotaId, kecamatanId, kelurahanId, fax, masterUserId, masterKategoriHargaId } = req.body;
+		let { namaCustomer, alamatLengkap, masterKategoriCustomerId, kodePos, nomorTelepon, email, longitude, latitude, provinsiId, kotaId, kecamatanId, kelurahanId, fax, masterUserId, masterKategoriHargaId, statusSurvey} = req.body;
 		let f1 = ""
 		if (!masterUserId) {
 			masterUserId = req.dataUsers.id;
 		}
 		if (req.files) {
-			if (req.files.file1) {
+			if (req.files.file1[0]) {
 				f1 = req.files.file1[0].filename
 			}
 		}
-		// console.log(req.body);
-		customer.create({ id: uuid_v4(), namaCustomer, alamatLengkap, masterKategoriCustomerId, kodePos, nomorTelepon, email, longitude, latitude, provinsiId, kotumId: kotaId, kecamatanId,kelurahanId, fax, masterUserId, masterKategoriHargaId, fotoCustomer: f1 })
+		console.log(req.body);
+		customer.create({ id: uuid_v4(), namaCustomer, alamatLengkap, masterKategoriCustomerId, kodePos, nomorTelepon, email, longitude, latitude, provinsiId, kotumId: kotaId, kecamatanId,kelurahanId, fax, masterUserId, masterKategoriHargaId, fotoCustomer: f1, statusSurvey })
 			.then((data) => {
 				res.status(200).json({ status: 200, message: "sukses", data: data });
 			})
@@ -74,7 +74,8 @@ class Customer {
 		// 	where mc."deletedAt" isnull 
 		// 	and mkc."deletedAt" isnull 
 		// 	and mc.id ='${id}'`);
-		let data = await sq.query(`select mc.id as "masterCustomerId" ,* from "masterCustomer" mc join "masterKategoriCustomer" mkc on mkc.id = mc."masterKategoriCustomerId" join "masterUser" mu ON mc."masterUserId" = mu.id where mc."deletedAt" isnull and mkc."deletedAt" isnull and mu."deletedAt" isnull and mc.id ='${id}'`)
+		// let data = await sq.query(`select mc.id as "masterCustomerId" ,* from "masterCustomer" mc join "masterKategoriCustomer" mkc on mkc.id = mc."masterKategoriCustomerId" join "masterUser" mu ON mc."masterUserId" = mu.id where mc."deletedAt" isnull and mkc."deletedAt" isnull and mu."deletedAt" isnull and mc.id ='${id}'`);
+		let data = await sq.query(`select mc.id as "masterCustomerId", mc."createdAt" as "mcCreatedAt",* from "masterCustomer" mc join "masterKategoriCustomer" mkc on mkc.id = mc."masterKategoriCustomerId" join "masterUser" mu ON mc."masterUserId" = mu.id where mc."deletedAt" isnull and mkc."deletedAt" isnull and mu."deletedAt" isnull and mc.id ='${id}'`);
 		res.status(200).json({ status: 200, message: "sukses", data: data[0] });
 	}
 

@@ -365,6 +365,26 @@ class Controller {
       });
     }
   }
+
+  static async listTransaksiPObyNomerPO (req,res){
+    const {nomorPO} = req.params
+    let TPO = await sq.query(`select tp.id as "transaksiPOId",tp.*,p."nomorPO" from "transaksiPO" tp join "PO" p on p.id = tp."POId" where tp."deletedAt" isnull and p."deletedAt" isnull and p."nomorPO" = '${nomorPO}' order by tp."createdAt" `)
+    let subTPO = await sq.query(`select stp.id as "subTransaksiPOId",stp.*,mb."namaBarang" from "subTransaksiPO" stp join "transaksiPO" tp on tp.id = stp."transaksiPOId" join "masterBarang" mb on mb.id = stp."masterBarangId" join "PO" p on p.id = tp."POId" where mb."deletedAt" isnull and tp."deletedAt" isnull and stp."deletedAt" isnull and p."deletedAt" isnull and p."nomorPO" = '${nomorPO}'`);
+    if(TPO[0].length==0){
+      res.status(200).json({status: 200,message: "data tidak ada"});
+    }else{
+      for (let i = 0; i < TPO[0].length; i++) {
+        TPO[0][i].barang=[];
+        for (let j = 0; j < subTPO[0].length; j++) {
+          if(TPO[0][i].transaksiPOId==subTPO[0][j].transaksiPOId){
+            TPO[0][i].barang=subTPO[0][j];
+          }
+          
+        }
+      }
+      res.status(200).json({status: 200,message: "sukses",data: TPO[0]});
+    }
+  }
 }
 
 module.exports = Controller;

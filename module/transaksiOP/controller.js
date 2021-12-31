@@ -28,6 +28,8 @@ class Controller {
         let isi="";
         let isiBarang="";
         let cek = false;
+        let cekBonus = false;
+        let cekBarang =[];
         let cekStock = [];
         let bonus =[];
 
@@ -36,6 +38,7 @@ class Controller {
             isiBarang+=` or s."masterBarangId" = '${sub[i].masterBarangId}'`;
         }
         let mstok = await sq.query(`select sum(s."jumlahStock") as "total", mb."namaBarang", s."masterBarangId",mb."jumlahTotalBarang" from stock s join "masterBarang" mb on mb.id = s."masterBarangId" where s."deletedAt" isnull and mb."deletedAt" isnull and mb.id = '${sub[0].masterBarangId}'${isi} group by s."masterBarangId", mb."namaBarang",mb."jumlahTotalBarang"`);
+        
         for (let j = 0; j < sub.length; j++) {
           for (let k = 0; k < mstok[0].length; k++) {
             if(sub[j].masterBarangId==mstok[0][k].masterBarangId){
@@ -44,94 +47,99 @@ class Controller {
                 cekStock.push({namaBarang:mstok[0][k].namaBarang,stock:mstok[0][k].total,order:sub[j].jumlahBarangOP});
               }
               if(sub[j].isBonus){
-                bonus.push({id:sub[j].masterBarangId,namaBarang:mstok[0][k].namaBarang,jumlahTotalBarang:mstok[0][k].jumlahTotalBarang-sub[j].jumlahBarangOP})
+                bonus.push({id:sub[j].masterBarangId,namaBarang:mstok[0][k].namaBarang,jumlahTotalBarang:mstok[0][k].jumlahTotalBarang-sub[j].jumlahBarangOP});
+                if(mstok[0][k].jumlahTotalBarang < sub[j].jumlahBarangOP){
+                  cekBonus=true;
+                  cekBarang.push({namaBarang:mstok[0][k].namaBarang,jumlahTotalBarang:mstok[0][k].jumlahTotalBarang,barangBonus:sub[j].jumlahBarangOP});
+                }
               }
             }
           }
         }
-        // console.log(bonus);
-        // console.log(cekStock);
-        // console.log(mstok[0]);
+      
         if(cek){
           res.status(200).json({status:200,message:"stock tidak cukup",data:cekStock});
         }else{
-          transaksiOP.create({id: idTrans,namaPengirimOP,tanggalPengirimanOP,nomorDO,OPId,masterUserId,statusTransaksiOP}).then(async(data2)=>{
-          let hasil=[];
-          let bStock = await sq.query(`select * from stock s where s."deletedAt" isnull and s."jumlahStock" > 0 and s."masterBarangId" = '${sub[0].masterBarangId}'${isiBarang} order by s."tanggalKadaluarsa", s."createdAt"`);
-          // console.log(bStock[0]);
-          // console.log("==========================");
-          for (let l = 0; l < sub.length; l++) {
-            for (let m = 0; m < bStock[0].length; m++) {
-              if(sub[l].masterBarangId == bStock[0][m].masterBarangId){
-                if(sub[l].jumlahBarangOP>0 && bStock[0][m].jumlahStock>0){
-                  let jml = bStock[0][m].jumlahStock;
-                  if(sub[l].jumlahBarangOP>bStock[0][m].jumlahStock){
-                    bStock[0][m].jumlahStock=0;
-                  }else{
-                    bStock[0][m].jumlahStock -= sub[l].jumlahBarangOP;
+          if(cekBonus){
+            res.status(200).json({status:200,message:"bonus boked",data:cekBarang});
+          }else{
+            transaksiOP.create({id: idTrans,namaPengirimOP,tanggalPengirimanOP,nomorDO,OPId,masterUserId,statusTransaksiOP}).then(async(data2)=>{
+              let hasil=[];
+              let bStock = await sq.query(`select * from stock s where s."deletedAt" isnull and s."jumlahStock" > 0 and s."masterBarangId" = '${sub[0].masterBarangId}'${isiBarang} order by s."tanggalKadaluarsa", s."createdAt"`);
+              // console.log(bStock[0]);
+              // console.log("==========================");
+              for (let l = 0; l < sub.length; l++) {
+                for (let m = 0; m < bStock[0].length; m++) {
+                  if(sub[l].masterBarangId == bStock[0][m].masterBarangId){
+                    if(sub[l].jumlahBarangOP>0 && bStock[0][m].jumlahStock>0){
+                      let jml = bStock[0][m].jumlahStock;
+                      if(sub[l].jumlahBarangOP>bStock[0][m].jumlahStock){
+                        bStock[0][m].jumlahStock=0;
+                      }else{
+                        bStock[0][m].jumlahStock -= sub[l].jumlahBarangOP;
+                      }
+                      sub[l].jumlahBarangOP -= jml;
+                      if(sub[l].jumlahBarangOP<1){
+                        sub[l].jumlahBarangOP=0;
+                      }
+                      hasil.push({id:bStock[0][m].id,jumlahStock:bStock[0][m].jumlahStock,tanggalKadaluarsa:bStock[0][m].tanggalKadaluarsa,masterBarangId:bStock[0][m].masterBarangId,batchNumber:bStock[0][m].batchNumber});
+                    }
                   }
-                  sub[l].jumlahBarangOP -= jml;
-                  if(sub[l].jumlahBarangOP<1){
-                    sub[l].jumlahBarangOP=0;
-                  }
-                  hasil.push({id:bStock[0][m].id,jumlahStock:bStock[0][m].jumlahStock,tanggalKadaluarsa:bStock[0][m].tanggalKadaluarsa,masterBarangId:bStock[0][m].masterBarangId,batchNumber:bStock[0][m].batchNumber});
-                }
+                };
               }
-            };
-          }
-            // console.log("=====================H=====================");
-            // console.log(hasil);
-            // console.log("=====================B===================");
-            // console.log(bonus);
-            stock.bulkCreate(hasil,{updateOnDuplicate:["jumlahStock"]}).then((data3)=>{
-              let subOP = [];
-              for (let n = 0; n < bulkBarangOP.length; n++) {
-                for (let o = 0; o < hasil.length; o++) {
-                  let x = {};
-                  if(bulkBarangOP[n].masterBarangId==hasil[o].masterBarangId){
-                    x["id"] = uuid_v4();
-                    x["jumlahBarangOP"] = bulkBarangOP[n].jumlahBarangOP;
-                    x["hargaJualOP"] = bulkBarangOP[n].hargaJualOP;
-                    x["hargaTotalOP"] = bulkBarangOP[n].hargaTotalOP;
-                    x["isBonus"] = bulkBarangOP[n].isBonus;
-                    x["stockId"] = hasil[o].id;
-                    x["transaksiOPId"] = idTrans;
-                    subOP.push(x);
+                // console.log("=====================H=====================");
+                // console.log(hasil);
+                // console.log("=====================B===================");
+                // console.log(bonus);
+                stock.bulkCreate(hasil,{updateOnDuplicate:["jumlahStock"]}).then((data3)=>{
+                  let subOP = [];
+                  for (let n = 0; n < bulkBarangOP.length; n++) {
+                    for (let o = 0; o < hasil.length; o++) {
+                      let x = {};
+                      if(bulkBarangOP[n].masterBarangId==hasil[o].masterBarangId){
+                        x["id"] = uuid_v4();
+                        x["jumlahBarangOP"] = bulkBarangOP[n].jumlahBarangOP;
+                        x["hargaJualOP"] = bulkBarangOP[n].hargaJualOP;
+                        x["hargaTotalOP"] = bulkBarangOP[n].hargaTotalOP;
+                        x["isBonus"] = bulkBarangOP[n].isBonus;
+                        x["stockId"] = hasil[o].id;
+                        x["transaksiOPId"] = idTrans;
+                        subOP.push(x);
+                      }
+                    }
                   }
-                }
-              }
-              // console.log("+++++++++++++++++++++++++++++++");
-              // console.log(subOP);
-              subTransaksiOP.bulkCreate(subOP).then((data4)=>{
-                if(bonus.length==0){
-                  res.status(200).json({status:200,message:"sukses"});
-                }else{
-                  masterBarang.bulkCreate(bonus,{updateOnDuplicate:["jumlahTotalBarang"]}).then((data5)=>{
-                    res.status(200).json({status:200,message:"sukses"});
+                  // console.log("+++++++++++++++++++++++++++++++");
+                  // console.log(subOP);
+                  subTransaksiOP.bulkCreate(subOP).then((data4)=>{
+                    if(bonus.length==0){
+                      res.status(200).json({status:200,message:"sukses"});
+                    }else{
+                      masterBarang.bulkCreate(bonus,{updateOnDuplicate:["jumlahTotalBarang"]}).then((data5)=>{
+                        res.status(200).json({status:200,message:"sukses"});
+                      }).catch((err)=>{
+                        console.log("MB-bulk",err);
+                        res.status(500).json({status:500,message:"gagal",data:err});
+                      });
+                    }
                   }).catch((err)=>{
-                    console.log("MB-bulk",err);
+                    console.log("Sub-bulk",err);
                     res.status(500).json({status:500,message:"gagal",data:err});
                   });
-                }
+                }).catch((err)=>{
+                  console.log("Stock-bulk",err);
+                  res.status(500).json({status:500,message:"gagal",data:err});
+                })
               }).catch((err)=>{
-                console.log("Sub-bulk",err);
+                console.log("Create",err);
                 res.status(500).json({status:500,message:"gagal",data:err});
               });
-            }).catch((err)=>{
-              console.log("Stock-bulk",err);
-              res.status(500).json({status:500,message:"gagal",data:err});
-            })
-          }).catch((err)=>{
-            console.log("Create",err);
-            res.status(500).json({status:500,message:"gagal",data:err});
-          });
+          }
         }
       }
     }).catch((err)=>{
       console.log("find-All",err);
       res.status(500).json({status:500,message:"gagal",data:err});
     });
-
   }
 
   static updateTransaksiOP(req, res) {

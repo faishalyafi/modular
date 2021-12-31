@@ -82,6 +82,16 @@ class Controller {
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
 
+  static async listKaryawanWNA(req,res){
+    let data =  await sq.query(`select dk.*,mp."namaPosisi",mp."kodePosisi",md."namaDivisi",md."kodeDivisi" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" where dk."deletedAt" isnull and mp."deletedAt" isnull and md."deletedAt" isnull and dk."kebangsaanKaryawan" = 'WNA' order by dk."createdAt"`);
+    res.status(200).json({ status: 200, message: "sukses", data: data[0]});
+  }
+
+  static async listKaryawanByStatus(req,res){
+    const {statusKerjaKaryawan} = req.params
+    let data = await sq.query(`select dk.*,mp."namaPosisi",mp."kodePosisi",md."namaDivisi",md."kodeDivisi" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" where dk."deletedAt" isnull and mp."deletedAt" isnull and md."deletedAt" isnull and dk."statusKerjaKaryawan" = ${statusKerjaKaryawan} order by dk."createdAt"`);
+    res.status(200).json({ status: 200, message: "sukses", data: data[0]});
+  }
 }
 
 module.exports = Controller;
