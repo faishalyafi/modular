@@ -20,17 +20,17 @@ const report = require("../module/report/route");
 const produksi = require("../module/produksi/route");
 const subProduksi = require("../module/subProduksi/route");
 const formula = require("../module/formula/route");
-const salesMobile=require('../module/salesMobile/route');
-const stockKeluar=require('../module/stockKeluar/route');
-const kategoriHarga=require('../module/masterKategoriHarga/route');
-const kelurahan=require('../module/kelurahan/route');
-const kecamatan=require('../module/kecamatan/route');
-const kota=require('../module/kota/route');
-const provinsi=require('../module/provinsi/route');
-const absensiSales=require('../module/absensiSales/route');
-const masterDivisi=require('../module/masterDivisi/route');
-const masterPosisi=require('../module/masterPosisi/route');
-const loker=require('../module/loker/route');
+const salesMobile = require('../module/salesMobile/route');
+const stockKeluar = require('../module/stockKeluar/route');
+const kategoriHarga = require('../module/masterKategoriHarga/route');
+const kelurahan = require('../module/kelurahan/route');
+const kecamatan = require('../module/kecamatan/route');
+const kota = require('../module/kota/route');
+const provinsi = require('../module/provinsi/route');
+const absensiSales = require('../module/absensiSales/route');
+const masterDivisi = require('../module/masterDivisi/route');
+const masterPosisi = require('../module/masterPosisi/route');
+const loker = require('../module/loker/route');
 const postLoker = require('../module/postLoker/route');
 const kelengkapanLamaran = require('../module/kelengkapanLamaran/route');
 const riwayatPendidikan = require('../module/riwayatPendidikan/route');
@@ -44,12 +44,13 @@ const masterKebutuhan = require("../module/masterKebutuhan/route");
 const masterAsuransi = require("../module/masterAsuransi/route");
 const dataKaryawan = require("../module/dataKaryawan/route");
 const poolPotonganAsuransi = require("../module/poolPotonganAsusransi/route");
+const poolKontrak = require("../module/poolKontrak/route");
 
 router.use("/user", user);
 router.use("/log", log);
 router.use("/unit", unit);
 router.use("/kategoriCustomer", customerCategory);
-router.use("/customer", customer); 
+router.use("/customer", customer);
 router.use("/masterBarang", masterBarang);
 router.use("/masterKategoriBarang", masterKategoriBarang);
 router.use("/masterSupplier", masterSupplier);
@@ -57,7 +58,7 @@ router.use("/pic", pic);
 router.use("/PO", PO);
 router.use("/PR", PR);
 router.use("/OP", OP);
-router.use("/bank", bank); 
+router.use("/bank", bank);
 router.use("/masterPengiriman", masterPengiriman);
 router.use("/gudang", gudang);
 router.use("/stock", stock);
@@ -67,17 +68,17 @@ router.use("/formula", formula);
 router.use("/report", report);
 router.use("/produksi", produksi);
 router.use("/subProduksi", subProduksi);
-router.use('/salesMobile',salesMobile);
-router.use('/stockKeluar',stockKeluar);
-router.use('/kategoriHarga',kategoriHarga);
-router.use('/kelurahan',kelurahan);
-router.use('/kecamatan',kecamatan);
-router.use('/kota',kota);
-router.use('/provinsi',provinsi);
-router.use('/absensiSales',absensiSales)
-router.use('/masterDivisi',masterDivisi)
-router.use('/masterPosisi',masterPosisi)
-router.use('/loker',loker)
+router.use('/salesMobile', salesMobile);
+router.use('/stockKeluar', stockKeluar);
+router.use('/kategoriHarga', kategoriHarga);
+router.use('/kelurahan', kelurahan);
+router.use('/kecamatan', kecamatan);
+router.use('/kota', kota);
+router.use('/provinsi', provinsi);
+router.use('/absensiSales', absensiSales)
+router.use('/masterDivisi', masterDivisi)
+router.use('/masterPosisi', masterPosisi)
+router.use('/loker', loker)
 router.use('/postLoker', postLoker);
 router.use('/kelengkapanLamaran', kelengkapanLamaran);
 router.use('/riwayatPendidikan', riwayatPendidikan);
@@ -90,5 +91,6 @@ router.use('/masterKebutuhan', masterKebutuhan);
 router.use('/masterAsuransi', masterAsuransi);
 router.use('/dataKaryawan', dataKaryawan);
 router.use('/poolPotonganAsuransi', poolPotonganAsuransi);
+router.use('/poolKontrak', poolKontrak);
 
 module.exports = router;
