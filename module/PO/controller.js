@@ -15,13 +15,13 @@ class Controller {
   }
 
   static register(req, res) {
-    const {nomorPO,tanggalPO,rencanaTglKedatangan,masterSupplierId,pembayaran,TOP,metodePengiriman,totalHarga,keterangan,PPN,bulkCC,promo,rev,bulkBarang,PRId} = req.body;
+    const { nomorPO, tanggalPO, rencanaTglKedatangan, masterSupplierId, pembayaran, TOP, metodePengiriman, totalHarga, keterangan, PPN, bulkCC, promo, rev, bulkBarang, PRId } = req.body;
     const idPO = uuid_v4();
     PO.findAll({ where: { nomorPO } }).then((data) => {
       if (data.length) {
         res.status(200).json({ status: 200, message: "nomorPO sudah ada" });
       } else {
-        PO.create({id: idPO,nomorPO,tanggalPO,rencanaTglKedatangan,masterSupplierId,pembayaran,TOP,metodePengiriman,totalHarga,keterangan,PPN,promo,rev,PRId}).then((data1) => {
+        PO.create({ id: idPO, nomorPO, tanggalPO, rencanaTglKedatangan, masterSupplierId, pembayaran, TOP, metodePengiriman, totalHarga, keterangan, PPN, promo, rev, PRId }).then((data1) => {
           for (let i = 0; i < bulkCC.length; i++) {
             const idCC = uuid_v4();
             bulkCC[i].POId = idPO;
@@ -40,19 +40,19 @@ class Controller {
                 bulkBarang[i].masterSupplierId = masterSupplierId;
               }
               poolHargaSupplier.bulkCreate(bulkBarang, { updateOnDuplicate: ["hargaBeli"] }).then((data4) => {
-                  if(PRId){
-                    PR.update({statusPR: 1},{where:{id:PRId}}).then((data5)=>{
-                      res.status(200).json({ status: 200, message: "sukses" });
-                    }).catch((err)=>{
-                      console.log("PR",err);
-                      res.status(500).json({ status: 500, message: "gagal", data: err });
-                    })
-                  }else{
+                if (PRId) {
+                  PR.update({ statusPR: 1 }, { where: { id: PRId } }).then((data5) => {
                     res.status(200).json({ status: 200, message: "sukses" });
-                  }
-                }).catch((err) => {
-                  res.status(500).json({ status: 500, message: "gagal", data: err });
-                });
+                  }).catch((err) => {
+                    console.log("PR", err);
+                    res.status(500).json({ status: 500, message: "gagal", data: err });
+                  })
+                } else {
+                  res.status(200).json({ status: 200, message: "sukses" });
+                }
+              }).catch((err) => {
+                res.status(500).json({ status: 500, message: "gagal", data: err });
+              });
             });
           });
         });
@@ -150,8 +150,8 @@ class Controller {
   // }
 
   static update(req, res) {
-    const {POId,tanggalPO,rencanaTglKedatangan,masterSupplierId,pembayaran,TOP,metodePengiriman,totalHarga,keterangan,PPN,promo,rev,bulkCC,bulkBarang,PRId} = req.body;
-    PO.update({tanggalPO,rencanaTglKedatangan,masterSupplierId,pembayaran,TOP,metodePengiriman,totalHarga,keterangan,PPN,promo,rev,PRId},{ where: { id: POId }}).then((data) => {
+    const { POId, tanggalPO, rencanaTglKedatangan, masterSupplierId, pembayaran, TOP, metodePengiriman, totalHarga, keterangan, PPN, promo, rev, statusPO, bulkCC, bulkBarang, PRId } = req.body;
+    PO.update({ tanggalPO, rencanaTglKedatangan, masterSupplierId, pembayaran, TOP, metodePengiriman, totalHarga, keterangan, PPN, promo, rev, statusPO, PRId }, { where: { id: POId } }).then((data) => {
       subPO.destroy({ where: { POId: POId } }).then((data) => {
         for (let i = 0; i < bulkBarang.length; i++) {
           const idSub = uuid_v4();
@@ -227,6 +227,36 @@ class Controller {
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
 
+  static async listByStatus(req, res) {
+    const { statusPO } = req.params;
+    let data = await sq.query(`
+    select p.id as "idPO", p."nomorPO",p."tanggalPO",p."rencanaTglKedatangan",p.pembayaran,p."TOP",p."metodePengiriman",p."totalHarga",p.keterangan,p."PPN",p.promo,p.rev,p."masterSupplierId",ms."namaSupplier",p."PRId",p2."nomorPR",sum(sp.jumlah) as "totalBarangPO",p."statusPO",p."createdAt" 
+    from "subPO" sp join "PO" p on p.id = sp."POId" 
+      join "masterSupplier" ms on ms.id = p."masterSupplierId" 
+      left join "PR" p2 on p2.id = p."PRId" 
+    where p."statusPO" = ${statusPO}
+      and sp."deletedAt" isnull 
+      and p."deletedAt" isnull 
+      and ms."deletedAt" isnull 
+      and p2."deletedAt" isnull 
+    group by p.id,sp."POId",ms."namaSupplier",p2."nomorPR" 
+    order by p."createdAt" desc`);
+    res.status(200).json({ status: 200, message: "sukses", data: data[0] });
+  }
+
+  static async listKedatanganPO(req, res) {
+    let data = await sq.query(`
+    select p.id as "POId", p."nomorPO" ,p2."nomorPR" ,p."tanggalPO" ,p."rencanaTglKedatangan" ,p.pembayaran ,p."TOP" ,p."metodePengiriman" ,p."totalHarga" ,p.keterangan ,p."PPN" ,p.promo ,p.rev ,p."masterSupplierId",ms."namaSupplier" ,p."statusPO" 
+    from "PO" p 
+    left join "transaksiPO" tp on tp."POId" = p.id 
+    left join "PR" p2 on p2.id = p."PRId" 
+    join "masterSupplier" ms on ms.id = p."masterSupplierId" 
+    where p."deletedAt" isnull 
+    and tp."deletedAt" isnull 
+    and ms."deletedAt" isnull  `);
+    res.status(200).json({ status: 200, message: "sukses", data: data[0] });
+  }
+
   static async hargaPOTerahir(req, res) {
     const { masterSupplierId, masterBarangId } = req.body;
     const id = masterBarangId + "-" + masterSupplierId;
@@ -293,6 +323,44 @@ class Controller {
     // console.log(data[0].length)
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
+
+  static async detailsBarangPOByNoPO(req,res){
+    const {nomorPO} = req.params
+
+    PO.findAll({where:{nomorPO},raw:true}).then(async(data)=>{
+      if(data.length==0){
+        res.status(200).json({status:200,message:"data tidak ada"});
+      }else{
+        let order = await sq.query(`select sp.id as "subPOId", sp.jumlah as "jumlahOrder",sp."hargaBeli",sp."totalHargaPerBarang",sp."POId",sp."masterBarangId" ,mb."namaBarang",p2."nomorPR",mb."masterKategoriBarangId",mkb."namaKategori" from "subPO" sp join "PO" p on p.id = sp."POId" left join "PR" p2 on p2.id = p."PRId" join "masterBarang" mb on mb.id = sp."masterBarangId" join "masterKategoriBarang" mkb on mkb.id = mb."masterKategoriBarangId" where sp."deletedAt" isnull and p."deletedAt" isnull and p2."deletedAt" isnull and mkb."deletedAt" isnull and p."nomorPO" = '${nomorPO}'`);
+        let TPO = await sq.query(`select stp."masterBarangId",stp."hargaTransaksi", mb."namaBarang", sum(stp."jumlahBarangSubTransaksiPO") as "terkirim" from "subTransaksiPO" stp join "transaksiPO" tp on tp.id = stp."transaksiPOId" join "PO" p on p.id = tp."POId" join "masterBarang" mb on mb.id = stp."masterBarangId" where stp."deletedAt" isnull and tp."deletedAt" isnull and p."deletedAt" isnull and p."nomorPO" = '${nomorPO}' group by stp."masterBarangId", mb."namaBarang", stp."hargaTransaksi" `);
+        // let TPO = await sq.query(`select stp.id as "subTransaksiPOId",stp.*,mb."namaBarang" from "subTransaksiPO" stp join "transaksiPO" tp on tp.id = stp."transaksiPOId" join "PO" p on p.id = tp."POId" join "masterBarang" mb on mb.id = stp."masterBarangId" where stp."deletedAt" isnull and tp."deletedAt" isnull and p."deletedAt" isnull and p."nomorPO" = '${nomorPO}'`);
+        // console.log(order[0]);
+        // console.log("========================");
+        // console.log(TPO[0]);
+
+        for (let i = 0; i < order[0].length; i++) {
+            order[0][i].jmlTerkirim = 0;
+            order[0][i].jmlBelumDikirim = 0;
+            if(TPO[0].length){
+              for (let j = 0; j < TPO[0].length; j++) {
+                if(order[0][i].masterBarangId == TPO[0][j].masterBarangId && order[0][i].hargaBeli == TPO[0][j].hargaTransaksi){
+                  order[0][i].jmlTerkirim = TPO[0][j].terkirim;
+                  order[0][i].jmlBelumDikirim = order[0][i].jumlahOrder - TPO[0][j].terkirim;
+                }
+              }
+            }
+        }
+        data[0].nomorPR = order[0][0].nomorPR;
+        data[0].barang = order[0];
+        res.status(200).json({ status: 200, message: "sukses",data});
+
+      }
+    }).catch((err)=>{
+      console.log("err",err);
+      res.status(500).json({ status: 500, message: "gagal",data:err });
+    })
+  }
+
 }
 
 module.exports = Controller;

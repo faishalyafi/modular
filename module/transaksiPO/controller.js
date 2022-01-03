@@ -64,14 +64,16 @@ class Controller {
   static async detailsById(req, res) {
     const { id } = req.params;
     let data = await sq.query(`
-      select tp."id" as "transaksiPOId",* 
+      select tp."id" as "transaksiPOId",* ,s."batchNumber" 
       from "transaksiPO" tp 
       join "subTransaksiPO" stp on tp."id" = stp."transaksiPOId" 
+      join stock s on s."subTransaksiPOId" = stp.id 
       join "masterBarang" mb on stp."masterBarangId" = mb."id"
       where tp."id" = '${id}'
       and tp."deletedAt" isnull 
       and stp."deletedAt" isnull 
-      and mb."deletedAt" isnull`);
+      and mb."deletedAt" isnull 
+      and s."deletedAt" isnull `);
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
 
@@ -254,14 +256,16 @@ class Controller {
       from "PO" p2
       join "subPO" sp on sp."POId" = p2.id 
       where p2.id = p.id 
-      and sp."deletedAt" isnull)
+      and sp."deletedAt" isnull),
+      tp."createdAt" 
     from "transaksiPO" tp 
       join "PO" p on p.id = tp."POId" 
       join "masterSupplier" ms on ms.id = p."masterSupplierId" 
     where 
       tp."deletedAt" isnull 
       and p."deletedAt" isnull 
-      and ms."deletedAt" isnull `);
+      and ms."deletedAt" isnull 
+    order by tp."createdAt" desc `);
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
 
@@ -335,7 +339,7 @@ class Controller {
       let subTp = [];
       // console.log(data[0]);
       // console.log("=====================================");
-      for (let i = 0; i < data.length; i++) {
+      for (let i = 0; i < data[0].length; i++) {
         mBarang.push({id:data[0][i].masterBarangId, namaBarang:data[0][i].namaBarang,jumlahTotalBarang:data[0][i].jumlahTotalBarang-data[0][i].jumlahBarangSubTransaksiPO});
         subTp.push(data[0][i].stpId)
       }
@@ -377,7 +381,7 @@ class Controller {
         TPO[0][i].barang=[];
         for (let j = 0; j < subTPO[0].length; j++) {
           if(TPO[0][i].transaksiPOId==subTPO[0][j].transaksiPOId){
-            TPO[0][i].barang=subTPO[0][j];
+            TPO[0][i].barang.push(subTPO[0][j]);
           }
           
         }
