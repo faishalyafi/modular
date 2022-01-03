@@ -2,6 +2,7 @@ const { DataTypes } = require('sequelize');
 const sq = require('../../config/connection');
 const posisi = require('../masterPosisi/model');
 const divisi = require('../masterDivisi/model');
+const masterShift = require('../masterShift/model');
 
 const dataKaryawan = sq.define('dataKaryawan', {
     id: {
@@ -92,5 +93,8 @@ posisi.hasMany(dataKaryawan);
 
 dataKaryawan.belongsTo(divisi);
 divisi.hasMany(dataKaryawan);
+
+dataKaryawan.belongsTo(masterShift);
+masterShift.hasMany(dataKaryawan);
 
 module.exports = dataKaryawan

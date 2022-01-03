@@ -45,6 +45,7 @@ const masterAsuransi = require("../module/masterAsuransi/route");
 const dataKaryawan = require("../module/dataKaryawan/route");
 const poolPotonganAsuransi = require("../module/poolPotonganAsusransi/route");
 const poolKontrak = require("../module/poolKontrak/route");
+const masterShift = require("../module/masterShift/route");
 
 router.use("/user", user);
 router.use("/log", log);
@@ -92,5 +93,6 @@ router.use('/masterAsuransi', masterAsuransi);
 router.use('/dataKaryawan', dataKaryawan);
 router.use('/poolPotonganAsuransi', poolPotonganAsuransi);
 router.use('/poolKontrak', poolKontrak);
+router.use('/masterShift', masterShift);
 
 module.exports = router;
