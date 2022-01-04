@@ -92,6 +92,16 @@ class Controller {
     let data = await sq.query(`select dk.id as "dataKaryawanId",dk.*,mp."namaPosisi",mp."kodePosisi",md."namaDivisi",md."kodeDivisi" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" where dk."deletedAt" isnull and mp."deletedAt" isnull and md."deletedAt" isnull and dk."statusKerjaKaryawan" = ${statusKerjaKaryawan} order by dk."createdAt"`);
     res.status(200).json({ status: 200, message: "sukses", data: data[0]});
   }
+  static async listByMasterShiftId(req, res) {
+    const { masterShiftId } = req.params;
+    let data = await sq.query(`select dk.id as "dataKaryawanId",ms."namaShift" ,ms."jamAwal" ,ms."jamAkhir" ,dk.*,mp."namaPosisi",md."namaDivisi",md."kodeDivisi" from "dataKaryawan" dk 
+    join "masterPosisi" mp on mp.id = dk."masterPosisiId" 
+    join "masterDivisi" md on md.id = dk."masterDivisiId" 
+    join "masterShift" ms on ms.id=dk."masterShiftId" 
+    where dk."deletedAt" isnull and mp."deletedAt" isnull and dk."deletedAt" isnull and dk."masterShiftId" ='${masterShiftId}'
+    `);
+    res.status(200).json({ status: 200, message: "sukses", data: data[0] });
+  }
 }
 
 module.exports = Controller;

@@ -1,4 +1,5 @@
 const masterShift = require("./model");
+const dataKaryawan = require("../dataKaryawan/model");
 const { v4: uuid_v4 } = require("uuid");
 const sq = require("../../config/connection");
 
@@ -42,6 +43,16 @@ class Controller {
     const { id, jamAwal, jamAkhir,namaShift} = req.body;
     masterShift.update({ jamAwal, jamAkhir,namaShift}, { where: { id }, returning: true }).then((data) => {
         console.log(data);
+        res.status(200).json({ status: 200, message: "sukses" , data:data[1]});
+    }).catch((err) => {
+      console.log("error");
+      res.status(500).json({ status: 500, message: "gagal", data: err });
+    });
+  }
+  static updateShiftByKaryawanId(req, res) {
+    const { masterShiftId, dataKaryawanId} = req.body;
+    dataKaryawan.update({ masterShiftId}, { where: { id:dataKaryawanId }, returning: true }).then((data) => {
+      console.log(data);
         res.status(200).json({ status: 200, message: "sukses" , data:data[1]});
     }).catch((err) => {
       console.log("error");
