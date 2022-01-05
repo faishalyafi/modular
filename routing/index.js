@@ -48,6 +48,7 @@ const poolKontrak = require("../module/poolKontrak/route");
 const masterShift = require("../module/masterShift/route");
 const masterKategoriPenilaian = require("../module/masterKategoriPenilaian/route");
 const masterPenilaian = require("../module/masterPenilaian/route");
+const masterKeteranganKaryawanKeluar = require("../module/masterKeteranganKaryawanKeluar/route");
 
 router.use("/user", user);
 router.use("/log", log);
@@ -98,5 +99,6 @@ router.use('/poolKontrak', poolKontrak);
 router.use('/masterShift', masterShift);
 router.use('/masterKategoriPenilaian', masterKategoriPenilaian);
 router.use('/masterPenilaian', masterPenilaian);
+router.use('/masterKeteranganKaryawanKeluar', masterKeteranganKaryawanKeluar);
 
 module.exports = router;
