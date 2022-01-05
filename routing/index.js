@@ -50,6 +50,7 @@ const masterKategoriPenilaian = require("../module/masterKategoriPenilaian/route
 const masterPenilaian = require("../module/masterPenilaian/route");
 const masterKeteranganKaryawanKeluar = require("../module/masterKeteranganKaryawanKeluar/route");
 const masterCuti = require("../module/masterCuti/route");
+const masterIjin = require("../module/masterIjin/route");
 
 router.use("/user", user);
 router.use("/log", log);
@@ -102,5 +103,6 @@ router.use('/masterKategoriPenilaian', masterKategoriPenilaian);
 router.use('/masterPenilaian', masterPenilaian);
 router.use('/masterKeteranganKaryawanKeluar', masterKeteranganKaryawanKeluar);
 router.use('/masterCuti', masterCuti);
+router.use('/masterIjin', masterIjin);
 
 module.exports = router;
