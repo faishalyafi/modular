@@ -18,22 +18,14 @@ class Controller {
             })
     }
 
-    static list(req, res) {
-        masterPenilaian.findAll()
-            .then(data => {
-                res.status(200).json({
-                    status: 200,
-                    message: "sukses",
-                    data: data
-                });
-            })
-            .catch(err => {
-                res.status(500).json({
-                    status: 500,
-                    message: "gagal",
-                    data: err
-                })
-            })
+    static async list(req, res) {
+        let data = await sq.query(`
+            select mp.id as "masterPenilaianId", mp.penilaian ,mp."masterKategoriPenilaianId" ,mkp."namaKategoriPenilaian" ,mp."createdAt" ,mp."updatedAt" ,mp."deletedAt" 
+                from "masterPenilaian" mp 
+                join "masterKategoriPenilaian" mkp on mkp.id = mp."masterKategoriPenilaianId" 
+            where mp."deletedAt" isnull 
+                and mkp."deletedAt" isnull `);
+        res.status(200).json({ status: 200, message: "sukses", data: data[0] });
     }
 
     static detailsById(req, res) {
