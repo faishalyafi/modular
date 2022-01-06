@@ -49,6 +49,7 @@ class Controller {
       res.status(500).json({ status: 500, message: "gagal", data: err });
     });
   }
+
   static updateShiftByKaryawanId(req, res) {
     const { masterShiftId, dataKaryawanId} = req.body;
     dataKaryawan.update({ masterShiftId}, { where: { id:dataKaryawanId }, returning: true }).then((data) => {
@@ -59,6 +60,7 @@ class Controller {
       res.status(500).json({ status: 500, message: "gagal", data: err });
     });
   }
+
   static delete(req, res) {
     const { id } = req.body;
     masterShift.destroy({ where: { id: id } }).then((data) => {
@@ -67,8 +69,6 @@ class Controller {
       res.status(500).json({ status: 500, message: "gagal", data: err });
     });
   }
-
-  
 
 }
 

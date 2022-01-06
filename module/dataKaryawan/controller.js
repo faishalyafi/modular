@@ -58,13 +58,32 @@ class Controller {
     })
   }
 
+  static pecatKaryawan (req,res){
+    const {dataKaryawanId,masterKeteranganKaryawanKeluarId,statusKerjaKaryawan} = req.body;
+    
+    dataKaryawan.findAll({where:{id:dataKaryawanId}}).then((data)=>{
+      if(data.length==0){
+        res.status(200).json({ status: 200, message: "data tidak ada"});
+      }else{
+        dataKaryawan.update({statusKerjaKaryawan,masterKeteranganKaryawanKeluarId},{where:{id:dataKaryawanId}}).then((data2)=>{
+          res.status(200).json({ status: 200, message: "sukses"});
+        });
+      }
+    }).catch((err)=>{
+      res.status(500).json({status: 500,message: "gagal",data: err});
+    })
+  }
+
   static async list(req, res) {
-    let data = await sq.query(`select dk.id as "dataKaryawanId",dk.*,mp."namaPosisi",mp."namaPosisi",md."namaDivisi",md."kodeDivisi" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" where dk."deletedAt" isnull and mp."deletedAt" isnull and dk."deletedAt" isnull`);
+    // let data = await sq.query(`select dk.id as "dataKaryawanId",dk.*,mp."namaPosisi",mp."namaPosisi",md."namaDivisi",md."kodeDivisi" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" where dk."deletedAt" isnull and mp."deletedAt" isnull and dk."deletedAt" isnull`);
+    let data = await sq.query(`select dk.id as "dataKaryawanId",dk.*,mp."namaPosisi",mp."namaPosisi",md."namaDivisi",md."kodeDivisi",mkkk."keteranganKaryawanKeluar" from "dataKaryawan" dk left join "masterKeteranganKaryawanKeluar" mkkk on mkkk.id = dk."masterKeteranganKaryawanKeluarId" join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" where dk."deletedAt" isnull and mp."deletedAt" isnull and dk."deletedAt" isnull and dk."statusKerjaKaryawan" < 2 order by dk."createdAt"`);
     res.status(200).json({ status: 200, message: "sukses",data:data[0]});
   }
   static async detailsById(req, res) {
     const {dataKaryawanId} = req.params
-    let data = await sq.query(`select dk.id as "dataKaryawanId",dk.*,mp."namaPosisi",mp."namaPosisi",md."namaDivisi",md."kodeDivisi" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" where dk."deletedAt" isnull and mp."deletedAt" isnull and dk."deletedAt" isnull and dk.id = '${dataKaryawanId}'`);
+    // let data = await sq.query(`select dk.id as "dataKaryawanId",dk.*,mp."namaPosisi",mp."namaPosisi",md."namaDivisi",md."kodeDivisi" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" where dk."deletedAt" isnull and mp."deletedAt" isnull and dk."deletedAt" isnull and dk.id = '${dataKaryawanId}'`);
+    // let data2 = await sq.query(`select ppa.id as "poolPotonganAsuransiId",ppa."nomorAsuransi",ppa."masterAsuransiId",ma."namaAsuransi" from "poolPotonganAsuransi" ppa join "masterAsuransi" ma on ma.id = ppa."masterAsuransiId" where ppa."deletedAt" isnull and ppa."dataKaryawanId" = '${dataKaryawanId}'`);
+    let data = await sq.query(`select dk.id as "dataKaryawanId",dk.*,mp."namaPosisi",mp."namaPosisi",md."namaDivisi",md."kodeDivisi",mkkk."keteranganKaryawanKeluar" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" left join "masterKeteranganKaryawanKeluar" mkkk on mkkk.id = dk."masterKeteranganKaryawanKeluarId" where dk."deletedAt" isnull and mp."deletedAt" isnull and md."deletedAt" isnull and dk.id = '${dataKaryawanId}'`);
     let data2 = await sq.query(`select ppa.id as "poolPotonganAsuransiId",ppa."nomorAsuransi",ppa."masterAsuransiId",ma."namaAsuransi" from "poolPotonganAsuransi" ppa join "masterAsuransi" ma on ma.id = ppa."masterAsuransiId" where ppa."deletedAt" isnull and ppa."dataKaryawanId" = '${dataKaryawanId}'`);
     data[0][0].Asuransi = data2[0]
     res.status(200).json({ status: 200, message: "sukses",data:data[0]});
@@ -72,34 +91,35 @@ class Controller {
   
   static async listByMasterPosisiId(req, res) {
     const { masterPosisiId } = req.params;
-    let data = await sq.query(`select dk.id as "dataKaryawanId",dk.*,mp."namaPosisi",mp."namaPosisi",md."namaDivisi",md."kodeDivisi" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" where dk."deletedAt" isnull and mp."deletedAt" isnull and dk."deletedAt" isnull and dk."masterPosisiId" ='${masterPosisiId}'`);
+    // let data = await sq.query(`select dk.id as "dataKaryawanId",dk.*,mp."namaPosisi",mp."namaPosisi",md."namaDivisi",md."kodeDivisi" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" where dk."deletedAt" isnull and mp."deletedAt" isnull and dk."deletedAt" isnull and dk."masterPosisiId" ='${masterPosisiId}'`);
+    let data =  await sq.query(`select dk.id as "dataKaryawanId",dk.*,mp."namaPosisi",mp."namaPosisi",md."namaDivisi",md."kodeDivisi",mkkk."keteranganKaryawanKeluar" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" left join "masterKeteranganKaryawanKeluar" mkkk on mkkk.id = dk."masterKeteranganKaryawanKeluarId" where dk."deletedAt" isnull and mp."deletedAt" isnull and dk."deletedAt" isnull and dk."statusKerjaKaryawan" < 2 and dk."masterPosisiId" ='${masterPosisiId}' order by dk."createdAt" `);
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
 
   static async listByMasterDivisiId(req, res) {
     const { masterDivisiId } = req.params;
-    let data = await sq.query(`select dk.id as "dataKaryawanId",dk.*,mp."namaPosisi",mp."namaPosisi",md."namaDivisi",md."kodeDivisi" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" where dk."deletedAt" isnull and mp."deletedAt" isnull and dk."deletedAt" isnull and dk."masterDivisiId" ='${masterDivisiId}'`);
+    // let data = await sq.query(`select dk.id as "dataKaryawanId",dk.*,mp."namaPosisi",mp."namaPosisi",md."namaDivisi",md."kodeDivisi" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" where dk."deletedAt" isnull and mp."deletedAt" isnull and dk."deletedAt" isnull and dk."masterDivisiId" ='${masterDivisiId}'`);
+    let data = await sq.query(`select dk.id as "dataKaryawanId",dk.*,mp."namaPosisi",mp."namaPosisi",md."namaDivisi",md."kodeDivisi",mkkk."keteranganKaryawanKeluar" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" left join "masterKeteranganKaryawanKeluar" mkkk on mkkk.id = dk."masterKeteranganKaryawanKeluarId" where dk."deletedAt" isnull and mp."deletedAt" isnull and dk."deletedAt" isnull and dk."statusKerjaKaryawan" < 2 and dk."masterDivisiId" ='${masterDivisiId}' order by dk."createdAt" `);
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
 
   static async listKaryawanWNA(req,res){
-    let data =  await sq.query(`select dk.id as "dataKaryawanId",dk.*,mp."namaPosisi",mp."kodePosisi",md."namaDivisi",md."kodeDivisi" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" where dk."deletedAt" isnull and mp."deletedAt" isnull and md."deletedAt" isnull and dk."kebangsaanKaryawan" = 'WNA' order by dk."createdAt"`);
+    // let data =  await sq.query(`select dk.id as "dataKaryawanId",dk.*,mp."namaPosisi",mp."kodePosisi",md."namaDivisi",md."kodeDivisi" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" where dk."deletedAt" isnull and mp."deletedAt" isnull and md."deletedAt" isnull and dk."kebangsaanKaryawan" = 'WNA' order by dk."createdAt"`);
+    let data = await sq.query(`select dk.id as "dataKaryawanId",dk.*,mp."namaPosisi",mp."kodePosisi",md."namaDivisi",md."kodeDivisi",mkkk."keteranganKaryawanKeluar" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" left join "masterKeteranganKaryawanKeluar" mkkk on mkkk.id = dk."masterKeteranganKaryawanKeluarId" where dk."deletedAt" isnull and mp."deletedAt" isnull and md."deletedAt" isnull and dk."statusKerjaKaryawan" < 2 and dk."kebangsaanKaryawan" = 'WNA' order by dk."createdAt"`);
     res.status(200).json({ status: 200, message: "sukses", data: data[0]});
   }
 
   static async listKaryawanByStatus(req,res){
     const {statusKerjaKaryawan} = req.params
-    let data = await sq.query(`select dk.id as "dataKaryawanId",dk.*,mp."namaPosisi",mp."kodePosisi",md."namaDivisi",md."kodeDivisi" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" where dk."deletedAt" isnull and mp."deletedAt" isnull and md."deletedAt" isnull and dk."statusKerjaKaryawan" = ${statusKerjaKaryawan} order by dk."createdAt"`);
+    // let data = await sq.query(`select dk.id as "dataKaryawanId",dk.*,mp."namaPosisi",mp."kodePosisi",md."namaDivisi",md."kodeDivisi" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" where dk."deletedAt" isnull and mp."deletedAt" isnull and md."deletedAt" isnull and dk."statusKerjaKaryawan" = ${statusKerjaKaryawan} order by dk."createdAt"`);
+    let data =  await sq.query(`select dk.id as "dataKaryawanId",dk.*,mp."namaPosisi",mp."kodePosisi",md."namaDivisi",md."kodeDivisi",mkkk."keteranganKaryawanKeluar" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" left join "masterKeteranganKaryawanKeluar" mkkk on mkkk.id = dk."masterKeteranganKaryawanKeluarId" where dk."deletedAt" isnull and mp."deletedAt" isnull and md."deletedAt" isnull and dk."statusKerjaKaryawan" = ${statusKerjaKaryawan} order by dk."createdAt"`);
     res.status(200).json({ status: 200, message: "sukses", data: data[0]});
   }
+
   static async listByMasterShiftId(req, res) {
     const { masterShiftId } = req.params;
-    let data = await sq.query(`select dk.id as "dataKaryawanId",ms."namaShift" ,ms."jamAwal" ,ms."jamAkhir" ,dk.*,mp."namaPosisi",md."namaDivisi",md."kodeDivisi" from "dataKaryawan" dk 
-    join "masterPosisi" mp on mp.id = dk."masterPosisiId" 
-    join "masterDivisi" md on md.id = dk."masterDivisiId" 
-    join "masterShift" ms on ms.id=dk."masterShiftId" 
-    where dk."deletedAt" isnull and mp."deletedAt" isnull and dk."deletedAt" isnull and dk."masterShiftId" ='${masterShiftId}'
-    `);
+    // let data = await sq.query(`select dk.id as "dataKaryawanId",ms."namaShift" ,ms."jamAwal" ,ms."jamAkhir" ,dk.*,mp."namaPosisi",md."namaDivisi",md."kodeDivisi" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" join "masterShift" ms on ms.id=dk."masterShiftId" where dk."deletedAt" isnull and mp."deletedAt" isnull and dk."deletedAt" isnull and dk."masterShiftId" ='${masterShiftId}'`);
+    let data = await sq.query(`select dk.id as "dataKaryawanId",ms."namaShift" ,ms."jamAwal" ,ms."jamAkhir" ,dk.*,mp."namaPosisi",md."namaDivisi",md."kodeDivisi",mkkk."keteranganKaryawanKeluar" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" join "masterShift" ms on ms.id=dk."masterShiftId" left join "masterKeteranganKaryawanKeluar" mkkk on mkkk.id = dk."masterKeteranganKaryawanKeluarId" where dk."deletedAt" isnull and mp."deletedAt" isnull and dk."deletedAt" isnull and dk."statusKerjaKaryawan" <2 and dk."masterShiftId" ='${masterShiftId}' order by dk."createdAt"`);
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
 }

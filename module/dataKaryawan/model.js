@@ -3,6 +3,7 @@ const sq = require('../../config/connection');
 const posisi = require('../masterPosisi/model');
 const divisi = require('../masterDivisi/model');
 const masterShift = require('../masterShift/model');
+const masterKeluar = require('../masterKeteranganKaryawanKeluar/model');
 
 const dataKaryawan = sq.define('dataKaryawan', {
     id: {
@@ -96,5 +97,8 @@ divisi.hasMany(dataKaryawan);
 
 dataKaryawan.belongsTo(masterShift);
 masterShift.hasMany(dataKaryawan);
+
+dataKaryawan.belongsTo(masterKeluar);
+masterKeluar.hasMany(dataKaryawan);
 
 module.exports = dataKaryawan
