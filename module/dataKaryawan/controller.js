@@ -122,6 +122,20 @@ class Controller {
     let data = await sq.query(`select dk.id as "dataKaryawanId",ms."namaShift" ,ms."jamAwal" ,ms."jamAkhir" ,dk.*,mp."namaPosisi",md."namaDivisi",md."kodeDivisi",mkkk."keteranganKaryawanKeluar" from "dataKaryawan" dk join "masterPosisi" mp on mp.id = dk."masterPosisiId" join "masterDivisi" md on md.id = dk."masterDivisiId" join "masterShift" ms on ms.id=dk."masterShiftId" left join "masterKeteranganKaryawanKeluar" mkkk on mkkk.id = dk."masterKeteranganKaryawanKeluarId" where dk."deletedAt" isnull and mp."deletedAt" isnull and dk."deletedAt" isnull and dk."statusKerjaKaryawan" <2 and dk."masterShiftId" ='${masterShiftId}' order by dk."createdAt"`);
     res.status(200).json({ status: 200, message: "sukses", data: data[0] });
   }
+  static async totalKaryawanAktif(req, res) {
+    let data = await sq.query(`select count(id) AS "totalKaryawan" from "dataKaryawan" dk 
+    where dk."deletedAt" isnull and "masterKeteranganKaryawanKeluarId" isnull`);
+    res.status(200).json({ status: 200, message: "sukses", data: data[0] });
+  }
+  static async listTotalKaryawanPerDivisi(req, res) {
+    let data = await sq.query(`select md."namaDivisi" ,count("masterDivisiId") as "totalKaryawan" from "dataKaryawan" dk 
+    join "masterDivisi" md on md.id=dk."masterDivisiId" 
+    where dk."deletedAt" isnull and md."deletedAt" isnull and dk."masterKeteranganKaryawanKeluarId" isnull
+    group by md."namaDivisi",dk."masterDivisiId" 
+    order by md."namaDivisi"`);
+    res.status(200).json({ status: 200, message: "sukses", data: data[0] });
+  }
+
 }
 
 module.exports = Controller;
