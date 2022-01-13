@@ -235,12 +235,9 @@ class Controller {
 
   static listByMasterDivisiId(req, res) {
     const { masterDivisiId } = req.params;
-    console.log(req.params);
     user
       .findAll({
-        where: {
-          masterDivisiId: masterDivisiId,
-        },
+        where: { masterDivisiId }
       })
       .then((data) => {
         res.status(200).json({ status: 200, message: "sukses", data });
