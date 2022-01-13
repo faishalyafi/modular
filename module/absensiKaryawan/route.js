@@ -8,14 +8,14 @@ router.use(fileUpload());
 router.post("/insert", authentification, Controller.insert);
 router.post("/register", authentification, Controller.register);
 router.get("/list", authentification, Controller.list);
-router.get("/listAbsenByBulan", authentification, Controller.listAbsenByBulan);
+router.post("/listAbsenByBulan", authentification, Controller.listAbsenByBulan);
 router.get("/listAbsenByDivisi/:masterDivisiId", authentification, Controller.listAbsenByDivisi);
 router.get("/listAbsenByPosisi/:masterPosisiId", authentification, Controller.listAbsenByPosisi);
 router.get("/listAbsenByKaryawanId/:datakaryawanId", authentification, Controller.listAbsenByKaryawanId);
-router.post("/searchAbsen", authentification, Controller.searchAbsen);
+router.post("/detailAbsenKaryawanByBulan", authentification, Controller.detailAbsenKaryawanByBulan);
 router.post("/update", authentification, Controller.update);
 router.post("/delete", authentification, Controller.delete);
-
+// router.post("/listDetailsAbsenByDataKaryawanId", authentification, Controller.listDetailsAbsenByDataKaryawanId);
 
 
 module.exports = router
