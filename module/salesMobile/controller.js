@@ -288,7 +288,56 @@ class Controller{
         res.status(200).json({ status: 200, message: "sukses",data:data[0]})
     }
 
+    static async listPiutangPerToko(req, res) {
+        let { masterCustomerId } = req.params;
 
+        let data2 = await sq.query(`select o.id as "OPId",o."nomorOP" ,o."tanggalOrderOP" ,o."metodePembayaranOP" ,o."TOPPenjualanOP" ,o."keteranganPenjualanOP" ,o."PPNPenjualanOP" ,o."totalHargaOP" ,o."statusOP" ,o."masterCustomerId" ,o."masterUserId" ,o."createdAt" ,o."updatedAt" ,o."deletedAt" ,mp.id as "masterPiutangId", mp."piutangAwal" ,mp."sisaPiutang" ,mp."TOPPiutang" ,mp."statusPiutang" ,mp."tanggalPiutang" ,mp."OPId" as "IDOp" from "OP" o left join "masterPiutang" mp on mp."OPId" = o.id where o."masterCustomerId" = '${masterCustomerId}' and o."masterUserId" = '${req.dataUsers.id}' and o."deletedAt" isnull and mp."deletedAt" isnull `);
+
+        let dataOP = [];
+        let dataMp = [];
+        for (let i = 0; i < data2[0].length; i++) {
+            dataOP.push({
+                OPId: data2[0][i].OPId,
+                nomorOP: data2[0][i].nomorOP,
+                listPiutang: []
+            })
+            dataMp.push({
+                masterPiutangId: data2[0][i].masterPiutangId,
+                piutangAwal: data2[0][i].piutangAwal,
+                sisaPiutang: data2[0][i].sisaPiutang,
+                TOPPiutang: data2[0][i].TOPPiutang,
+                statusPiutang: data2[0][i].statusPiutang,
+                tanggalPiutang: data2[0][i].tanggalPiutang,
+                idOP: data2[0][i].IDOp
+            })
+        }
+
+        let check = {};
+        let dop = [];
+        for (let j = 0; j < dataOP.length; j++) {
+            if (!check[dataOP[j].OPId]) {
+                check[dataOP[j].OPId] = true;
+                dop.push(dataOP[j]);
+            }
+        }
+        
+        for (let k = 0; k < dop.length; k++) {
+            for (let l = 0; l < dataMp.length; l++) {
+                if (dop[k].OPId == dataMp[l].idOP) {
+                    dop[k].listPiutang.push({
+                        masterPiutangId: dataMp[l].masterPiutangId,
+                        piutangAwal: dataMp[l].piutangAwal,
+                        sisaPiutang: dataMp[l].sisaPiutang,
+                        TOPPiutang: dataMp[l].TOPPiutang,
+                        statusPiutang: dataMp[l].statusPiutang,
+                        tanggalPiutang: dataMp[l].tanggalPiutang
+                    });
+                }
+            }
+        }
+
+        res.status(200).json({ status: 200, message: "sukses", data: dop })
+    }
     
 }
 

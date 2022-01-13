@@ -21,5 +21,6 @@ router.get('/listJadwalPengirimanMobile/:halaman',authentification,Controller.li
 router.get('/listJadwalBatalMobile/:halaman',authentification,Controller.listJadwalBatalMobile)
 router.get('/listBarangSalesMobile/:halaman',authentification,Controller.listBarangSalesMobile)
 router.post('/listSOBySalesMobile',authentification,Controller.listSOBySalesMobile)
+router.get('/listPiutangPerToko/:masterCustomerId', authentification,Controller.listPiutangPerToko)
 
 module.exports = router;
