@@ -1,5 +1,5 @@
 const { v4: uuid_v4 } = require("uuid");
-const sq = require('../config/connection');
+const sq = require('../../config/connection');
 const absensiKaryawan = require('./model');
 const karyawan = require('../dataKaryawan/model');
 const moment = require('moment');
