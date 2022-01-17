@@ -11,7 +11,7 @@ class Customer {
 			masterUserId = req.dataUsers.id;
 		}
 		if (req.files) {
-			if (req.files.file1[0]) {
+			if (req.files.file1) {
 				f1 = req.files.file1[0].filename
 			}
 		}

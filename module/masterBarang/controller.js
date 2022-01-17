@@ -8,7 +8,7 @@ class Controller {
     const id = uuid_v4();
     let foto = "";
     if (req.files) {
-      if (req.files.file1[0]) {
+      if (req.files.file1) {
         foto = req.files.file1[0].filename;
       }
     }

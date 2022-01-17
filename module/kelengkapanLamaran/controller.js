@@ -121,7 +121,7 @@ class Controller {
         res.status(200).json({status:200,message:"data tidak ada"});
       }else{
         if(req.files){
-          if(req.files.file1[0]){
+          if(req.files.file1){
             file1=req.files.file1[0].filename;
           }
         }
